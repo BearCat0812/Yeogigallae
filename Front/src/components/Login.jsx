@@ -17,7 +17,7 @@ const Login = () => {
           <input type="password" id="password" placeholder="비밀번호를 입력하세요" />
         </div>
         <button type="submit" className="login-button">로그인</button>
-        <button type="submit" className="regist-button" onClick={() => navigate('/regist')}>회원가입</button>
+        <button type="button" className="regist-button" onClick={() => navigate('/regist')}>회원가입</button>
       </form>
     </div>
   );
