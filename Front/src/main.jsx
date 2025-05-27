@@ -4,8 +4,13 @@ import App from './App.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import './assets/fontawesome/all.css';
 
+<<<<<<< Updated upstream
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
+=======
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+>>>>>>> Stashed changes
     <App />
   </BrowserRouter>
 );

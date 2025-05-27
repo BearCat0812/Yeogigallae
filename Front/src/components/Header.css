@@ -21,4 +21,14 @@
 .login-btn {
     background: transparent;
     border: none;
+    margin-right: 10px;
+}
+.regist-btn {
+    background: transparent;
+    border: none;
+    margin-right: 30px;
+}
+.mypage-btn {
+    background: transparent;
+    border: none;
 }
