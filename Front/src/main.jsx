@@ -11,6 +11,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 createRoot(document.getElementById('root')).render(
   <StrictMode>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

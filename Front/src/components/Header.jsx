@@ -1,7 +1,11 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { Link } from 'react-router-dom';
 import React from 'react'
+=======
+import React from 'react';
+>>>>>>> Stashed changes
 =======
 import React from 'react';
 >>>>>>> Stashed changes
@@ -13,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const navigate = useNavigate();
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 
   return (
@@ -36,6 +41,8 @@ const Header = () => {
 };
 
 =======
+=======
+>>>>>>> Stashed changes
 
   return (
     <div class="header">
@@ -48,5 +55,8 @@ const Header = () => {
   );
 };
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 export default Header;
