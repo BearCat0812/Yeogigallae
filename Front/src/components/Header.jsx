@@ -1,6 +1,10 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { Link } from 'react-router-dom';
 import React from 'react'
+=======
+import React from 'react';
+>>>>>>> Stashed changes
 =======
 import React from 'react';
 >>>>>>> Stashed changes
@@ -9,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const navigate = useNavigate();
+<<<<<<< Updated upstream
 
   return (
 <<<<<<< Updated upstream
@@ -30,4 +35,18 @@ const Header = () => {
   );
 };
 
+=======
+
+  return (
+    <div class="header">
+      <img src="/images/logo.png" alt="logo" class="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}/>
+      <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <button class="login-btn" onClick={() => navigate('/login')}>로그인</button>
+      <button class="regist-btn" onClick={() => navigate('/regist')}>회원가입</button>
+      <button class="mypage-btn" onClick={() => navigate('/mypage')}>마이페이지</button>
+    </div>
+  );
+};
+
+>>>>>>> Stashed changes
 export default Header;

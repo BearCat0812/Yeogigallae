@@ -10,6 +10,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 =======
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     <App />
   </BrowserRouter>

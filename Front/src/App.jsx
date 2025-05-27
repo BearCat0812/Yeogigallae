@@ -1,10 +1,13 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Header from './components/Header.jsx'
 import Home from './pages/Home'
 =======
+=======
+>>>>>>> Stashed changes
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
@@ -12,6 +15,7 @@ import Main from './components/Main';
 import Login from './components/Login';
 import MyPage from './components/MyPage';
 import Regist from './components/Regist';
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
 
 function App() {
@@ -25,6 +29,11 @@ function App() {
     </div>
   )
 =======
+=======
+
+function App() {
+  return (
+>>>>>>> Stashed changes
     <BrowserRouter>
       <Header />
       <Routes>
@@ -35,6 +44,9 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }
 
