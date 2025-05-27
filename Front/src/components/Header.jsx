@@ -1,12 +1,15 @@
+import { Link } from 'react-router-dom';
 import React from 'react'
 import './Header.css';
 
 const Header = () => {
   return (
-    <div class="header">
-        <img src="/images/logo.png" alt="logo" class="logo"/>
-        <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-        <button class="login-btn">로그인/회원가입</button>
+    <div className="container">
+      <div className="header-container">
+        <Link to="/"><img src="/images/logoS.png" alt="logo" className="logo"/></Link>
+        <button className="search-btn"><i className="fa-solid fa-magnifying-glass"></i></button>
+        <button className="login-btn">로그인/회원가입</button>
+      </div>
     </div>
   )
 }
