@@ -1,8 +1,11 @@
 import React from 'react'
 import './Regist.css'
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Regist = () => {
+    const navigate = useNavigate();
+
   const [name, setName] = useState();
   const [email, setEmail] = useState();
   const [id, setId] = useState();
@@ -22,6 +25,7 @@ const Regist = () => {
       .then(res => {
         if (res.success) {
           alert("Regist Response Success");
+          navigate('/login');
         }
       })
   }
