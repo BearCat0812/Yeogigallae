@@ -22,13 +22,15 @@ const Login = () => {
       },
       body: JSON.stringify({ id, pw }),
     })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.success) {
-          sessionStorage.setItem("id", id);
+      .then(res => res.json())
+      .then(res => {
+        if (res.success == true) {
+          console.log(res);
+          sessionStorage.setItem("name", res.name); // Login.jsx의 id가 아니라 res.id를 받아와서 저장하도록 하자
           alert("Login Response Success");
+          navigate('/select');
         } else {
-          alert("로그인 실패");
+          alert("Login Failed..");
         }
       });
   };

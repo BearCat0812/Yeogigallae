@@ -11,16 +11,19 @@ const pool = mariadb.createPool({
     port: "3306"
 })
 
+// try-catch-finally 사용 권장
+
 async function registData(name, email, id, pw, tel) {
     let conn = await pool.getConnection();
     const rows = await conn.query('SELECT id, pw FROM users WHERE id = ?', [id]);
 
     if (rows.length == 0 || rows[0].id !== id) {
         conn.query("INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)", [name, email, id, pw, tel]);
-        console.log("회원가입 성공")
+        console.log("회원가입 성공");
     } else {
         console.log("이미 존재하는 아이디 입니다.");
     }
+    conn.release();
 }
 
 async function login(id, pw) {
@@ -29,12 +32,27 @@ async function login(id, pw) {
     if (rows.length > 0) {
         if (pw === rows[0].pw) {
             console.log("로그인 성공");
+            conn.release();
+            
+            return true;
         } else {
-            console.log("비밀번호가 다릅니다")
+            console.log("비밀번호가 다릅니다");
+
+            return false;
         }
     } else {
         console.log("아이디를 확인해주세요");
+
+        return false;
     }
+}
+
+async function searchIdToName(id) {
+    let conn = await pool.getConnection();
+    const rows = await conn.query('SELECT name FROM users WHERE id = ?', [id]);
+    conn.release();
+
+    return rows[0].name;
 }
 
 app.use(express.json());
@@ -48,8 +66,13 @@ app.post('/regist', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { id, pw } = req.body;
-    login(id, pw);
-    res.json({ success: true });
+    const check = await login(id, pw);
+    const name = await searchIdToName(id);
+    if (check == true) {
+        return res.json({ success: true, id: id, name: name });
+    } else {
+        return res.status(200).json({ success: false });
+    }
 })
 
 app.listen(8080, () => {

@@ -77,7 +77,7 @@ const Select = () => {
 
   return (
     <div className="select-container container">
-      <p className="select-hello">?님, 안녕하세요!</p>
+      <p className="select-hello">{sessionStorage.getItem('name')}님, 안녕하세요!</p>
       <p className="selectbar-container-label">현재 거주하시는 지역은 어디인가요?</p>
       <div className="selectbar-container">
         {[
