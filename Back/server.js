@@ -11,12 +11,12 @@ const pool = mariadb.createPool({
     port: "3306"
 })
 
-async function registData(id, pw) {
+async function registData(name, email, id, pw, tel) {
     let conn = await pool.getConnection();
     const rows = await conn.query('SELECT id, pw FROM users WHERE id = ?', [id]);
 
     if (rows.length == 0 || rows[0].id !== id) {
-        conn.query("INSERT INTO users(id,pw) VALUES (?,?)", [id, pw]);
+        conn.query("INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)", [name, email, id, pw, tel]);
         console.log("회원가입 성공")
     } else {
         console.log("이미 존재하는 아이디 입니다.");
@@ -27,7 +27,7 @@ async function login(id, pw) {
     let conn = await pool.getConnection();
     const rows = await conn.query('SELECT id, pw FROM users WHERE id = ?', [id]);
     if (rows.length > 0) {
-        if(pw === rows[0].pw){
+        if (pw === rows[0].pw) {
             console.log("로그인 성공");
         } else {
             console.log("비밀번호가 다릅니다")
@@ -41,8 +41,8 @@ app.use(express.json());
 app.use(cors());
 
 app.post('/regist', async (req, res) => {
-    const { id, pw } = req.body;
-    registData(id, pw);
+    const { name, email, id, pw, tel } = req.body;
+    registData(name, email, id, pw, tel);
     res.json({ success: true });
 })
 
