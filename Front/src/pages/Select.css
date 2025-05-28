@@ -1,0 +1,74 @@
+.select-container {
+  padding: 30px;
+}
+
+.selectbar-container {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 100px;
+}
+
+.select-hello {
+  font-size: 20px;
+}
+
+.selectbar-container-label {
+  font-family: "Bold", sans-serif;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.radio-label {
+  display: inline-block;
+  padding: 10px 0;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  transition: background-color 0.3s, border-color 0.3s;
+  font-size: 16px;
+  min-width: 120px;
+}
+
+.radio-label.checked {
+  background-color: #222;
+  color: #fff;
+}
+
+.submit-button {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  overflow: hidden;
+  transition: color 0.3s ease;
+  z-index: 0;
+  border-radius: 6px;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 0%;
+  background-color: #222;
+  z-index: -1;
+  transition: width 0.4s ease;
+}
+
+.submit-button:hover::before {
+  width: 100%;
+}
+
+.submit-button:hover {
+  color: #fff;
+}
+
+.animated-section {
+  overflow: hidden;
+}
