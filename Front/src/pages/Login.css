@@ -1,55 +1,195 @@
 .login-container {
-  width: 300px;
-  margin: 100px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fafafa;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.login-form {
+  padding: 50px;
+  min-height: 1000px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.form-group {
+.login-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-content img {
+  width: 40%;
+}
+
+form#login-form {
+  width: 500px;
+  padding: 50px;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+  border-radius: 10px;
+}
+
+form#login-form > p {
+  margin-top: auto;
+  width: 100%;
+  height: 100px;
+  font-size: 30px;
+  font-weight: bold;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+.login-form-group {
+  width: 100%;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+#id, #pw {
+  background: transparent;
+  padding: 0.5rem 0;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #222;
+  font-size: 15px;
+}
+
+#id {
+  margin-bottom: 20px;
+}
+
+#pw {
+  margin-bottom: 7px;
+}
+
+.login-form-group i {
+  position: absolute;
+  font-size: 20px;
+  right: 5px;
+  bottom: 23px;
+  cursor: pointer;
+}
+
+.login-check {
+  margin-bottom: 20px;
+}
+
+.login-form-group > input[type="checkbox"] {
+  display: none;
+}
+
+.login-form-group > label {
+  user-select: none;
+  color: #727272;
+}
+
+.login-form-group input[type="checkbox"] + label {
+  cursor: pointer;
+  padding-left: 26px;
+  background-image: url(../images/checkbox.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.login-form-group input[type="checkbox"]:checked + label {
+  background-image: url(../images/checkbox-active.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: #000;
+}
+
+.login-form-group > button {
+  width: 80%;
+  padding: 0.5rem;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 15px;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
+.login-form-group > button > img {
+  width: 20px;
+  margin-right: 7px;
 }
 
-.form-group input {
+.login-form-group > button#login {
+  margin-bottom: 0;
   width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
+  padding: 1rem;
+  background: #222;
+  color: #fff;
 }
 
-.login-button {
-  padding: 10px;
-  background-color: #502314;
-  color: white;
-  margin-top: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.etc {
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.login-button:hover {
-  background-color: #3e1b10;
+.login-form-group-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.regist-button {
-  padding: 10px;
-  background-color: #502314;
+
+.login-form-group > button#k-login {
+  background-color: #FEE500;
+}
+
+.login-form-group > button#n-login {
+  background-color: #2DB400;
   color: white;
-  border: none;
-  margin-top: 10px;
-  border-radius: 4px;
-  cursor: pointer;
 }
-.regist-button:hover {
-  background-color: #3e1b10;
+
+.login-form-group > button#n-login > img {
+  filter: invert(100%) sepia(1%) saturate(3710%) hue-rotate(146deg) brightness(113%) contrast(100%);
+}
+
+.login-form-group > button#g-login {
+  background-color: #fff;
+  border: 1px solid #eee;
+  margin: 0;
+}
+
+.login-form-group > button {
+  border-radius: 5px;
+}
+
+.login-menu {
+  height: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login-menu > button {
+  width: auto;
+  font-size: 14px;
+  background: none;
+  border: none;
+  outline: none;
+  color: #000;
+  display: flex;
+  justify-content: left;
+  padding: 0;
+}
+
+.login-menu > button:hover {
+  color: #0000FF;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.login-menu > a {
+  color: #000;
+}
+
+.login-menu > a:hover {
+  color: #0000FF;
 }

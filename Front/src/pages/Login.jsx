@@ -1,47 +1,106 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Login.css';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
 
-  const [id, setId] = useState();
-  const [pw, setPw] = useState();
+  const [id, setId] = useState('');
+  const [pw, setPw] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  function login(e) {
+  const togglePassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const login = (e) => {
     e.preventDefault();
     fetch("http://localhost:8080/login", {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: id, pw: pw })
+      body: JSON.stringify({ id, pw }),
     })
-      .then(res => res.json())
-      .then(res => {
+      .then((res) => res.json())
+      .then((res) => {
         if (res.success) {
           sessionStorage.setItem("id", id);
           alert("Login Response Success");
+        } else {
+          alert("로그인 실패");
         }
-      })
-
-  }
+      });
+  };
 
   return (
-    <div className="login-container">
-      <h2>로그인</h2>
-      <form className="login-form">
-        <div className="form-group">
-          <label htmlFor="username">아이디</label>
-          <input type="text" id="username" placeholder="아이디를 입력하세요" onChange={(e) => setId(e.target.value)} />
+    <div className="login-container container">
+      <form id="login-form">
+        <div className="login-content">
+          <img src="/images/logo.png" alt="여기갈래" />
         </div>
-        <div className="form-group">
-          <label htmlFor="password">비밀번호</label>
-          <input type="password" id="password" placeholder="비밀번호를 입력하세요" onChange={(e) => setPw(e.target.value)} />
+
+        <p>로그인</p>
+
+        <div className="login-form-group">
+          <input
+            type="text"
+            id="id"
+            placeholder="아이디"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+          />
         </div>
-        <button type="submit" className="login-button" onClick={login}>로그인</button>
-        <button type="button" className="regist-button" onClick={() => navigate('/regist')}>회원가입</button>
+
+        <div className="login-form-group">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id="pw"
+            placeholder="패스워드"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+          />
+          <i
+            className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'} fa-lg`}
+            onClick={togglePassword}
+            style={{ cursor: 'pointer' }}
+          />
+        </div>
+
+        <div className="login-form-group login-check">
+          <input type="checkbox" id="remember-check" />
+          <label htmlFor="remember-check">아이디 저장하기</label>
+        </div>
+
+        <div className="login-form-group">
+          <button type="submit" id="login" onClick={login}>
+            로그인
+          </button>
+        </div>
+
+        <div className="login-form-group login-menu">
+          <button type="button" className="regist-button" onClick={() => navigate('/regist')}>
+            가입하기
+          </button>
+          <a href="#">비밀번호를 잊어버리셨나요?</a>
+        </div>
+
+        <div className="login-form-group etc">또는</div>
+
+        <div className="login-form-group login-form-group-container">
+          <button id="k-login">
+            <img src="/images/kakao.svg" alt="kakao" />
+            카카오로 시작하기
+          </button>
+          <button id="n-login">
+            <img src="/images/naver.svg" alt="naver" />
+            네이버로 시작하기
+          </button>
+          <button id="g-login">
+            <img src="/images/google.svg" alt="google" />
+            Google로 시작하기
+          </button>
+        </div>
       </form>
     </div>
   );

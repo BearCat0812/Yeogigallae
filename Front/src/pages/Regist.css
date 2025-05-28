@@ -1,56 +1,219 @@
 .regist-container {
-  width: 300px;
-  margin: 100px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fafafa;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-.regist-form {
-  display: flex;
-  flex-direction: column;
+form.regist-form {
+    margin: 0 auto;
+    width: 500px;
+    padding: 50px;
+    border-radius: 10px;
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.form-group input {
+.regist-content {
   width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.login-button {
-  padding: 10px;
-  background-color: #502314;
-  color: white;
-  margin-top: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.regist-content img {
+  width: 40%;
 }
 
-.login-button:hover {
-  background-color: #3e1b10;
+.regist-form-group {
+    width: 100%;
+    position: relative;
+    padding-bottom: 35px;
 }
+
+.error-msg {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 5px;
+    font-size: 13px;
+    line-height: 1;
+}
+
+form.regist-form > p {
+    width: 100%;
+    height: 50px;
+    font-family: 'Bold', sans-serif;
+    font-size: 30px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+form.regist-form > h1 {
+    width: 100%;
+    height: 30px;
+    font-size: 15px;
+    font-weight: normal;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.regist-form-group > input, #info__id > input {
+    margin-top: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+    height: 50px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+#info__id {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 50px; /* 높이 고정 */
+    padding: 0 8px; /* 좌우만 패딩 */
+    box-sizing: border-box;
+}
+
+#info__id > input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    padding: 0 10px;
+    font-size: 14px;
+    background-color: transparent;
+    outline: none;
+    margin: 0;
+}
+
+#info__id > button.duplicate-check-btn {
+    flex-shrink: 0;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 3px;
+    border: none;
+    color: #fff;
+    background-color: #FF6D00;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#info__id > button.duplicate-check-btn:hover {
+    filter: brightness(0.9);
+}
+
+#info__pw,
+#info__pwRe {
+    position: relative;
+}
+
+#info__pw i,
+#info__pwRe i {
+    font-size: 20px;
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.email-group {
+    display: flex;
+    align-items: center;
+}
+
+.regist-form-group > .email-group > input,
+.regist-form-group > .email-group > select {
+    width: 31%;
+    height: 50px;
+    margin-right: 1%;
+    margin-top: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.regist-form-group > .email-group > select {
+    margin-right: 0;
+}
+
+.regist-form-group > .email-group > p {
+    width: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#info__mobile {
+    position: relative;
+}
+
+#info__mobile > input {
+    padding-right: 110px;
+    margin-top: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+    height: 50px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+#info__mobile > .duplicate-check-btn {
+    position: absolute;
+    width: 90px;
+    height: 40px;
+    bottom: 5px;
+    right: 5px;
+    border-radius: 3px;
+    border: none;
+    color: #fff;
+    background-color: #FF6D00;
+    cursor: pointer;
+}
+
+#info__mobile > .duplicate-check-btn:hover {
+    filter: brightness(0.9);
+}
+
+.jcc {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+}
+
 .regist-button {
-  padding: 10px;
-  background-color: #502314;
-  color: white;
-  border: none;
-  margin-top: 10px;
-  border-radius: 4px;
-  cursor: pointer;
+    width: 70%;
+    background-color: #222;
+    border: none;
+    font-size: 17px;
+    color: #fff;
+    padding: 15px;
+    cursor: pointer;
 }
+
 .regist-button:hover {
-  background-color: #3e1b10;
+    filter: brightness(0.9);
+}
+
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+input, textarea, select {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
