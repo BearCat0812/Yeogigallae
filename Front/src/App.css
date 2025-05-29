@@ -14,9 +14,12 @@
 
 @font-face {
   font-family: 'Italic';
-  src: url('./assets/fonts/font6.ttf') format('truetype');
+  src: url('./assets/fonts/font6.woff2') format('woff2'),
+       url('./assets/fonts/font6.woff') format('woff'),
+       url('./assets/fonts/font6.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 * {
