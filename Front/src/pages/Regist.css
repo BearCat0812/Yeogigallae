@@ -12,6 +12,8 @@ form.regist-form {
     width: 500px;
     padding: 50px;
     border-radius: 10px;
+    background-color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
 }
 
 .regist-content {
@@ -19,6 +21,7 @@ form.regist-form {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-bottom: 50px;
 }
 
 .regist-content img {
@@ -71,6 +74,7 @@ form.regist-form > h1 {
 }
 
 #info__id {
+    margin-top: 5px;
     position: relative;
     background-color: #fff;
     border: 1px solid #ddd;
@@ -101,7 +105,7 @@ form.regist-form > h1 {
     border-radius: 3px;
     border: none;
     color: #fff;
-    background-color: #FF6D00;
+    background-color: #222;
     cursor: pointer;
     font-size: 13px;
 }
@@ -167,23 +171,6 @@ form.regist-form > h1 {
     border-radius: 3px;
 }
 
-#info__mobile > .duplicate-check-btn {
-    position: absolute;
-    width: 90px;
-    height: 40px;
-    bottom: 5px;
-    right: 5px;
-    border-radius: 3px;
-    border: none;
-    color: #fff;
-    background-color: #FF6D00;
-    cursor: pointer;
-}
-
-#info__mobile > .duplicate-check-btn:hover {
-    filter: brightness(0.9);
-}
-
 .jcc {
     display: flex;
     justify-content: center;
@@ -191,6 +178,7 @@ form.regist-form > h1 {
 }
 
 .regist-button {
+    margin-top: 20px;
     width: 70%;
     background-color: #222;
     border: none;
@@ -198,6 +186,7 @@ form.regist-form > h1 {
     color: #fff;
     padding: 15px;
     cursor: pointer;
+    border-radius: 6px;
 }
 
 .regist-button:hover {
