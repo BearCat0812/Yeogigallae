@@ -1,5 +1,6 @@
 import React from 'react'
 import './About.css'
+import CardLayout from '../components/CardLayout.jsx';
 
 const About = () => {
   return (
@@ -31,6 +32,7 @@ const About = () => {
                 </ul>
             </div>
         </div>
+        <CardLayout />
     </div>
   )
 }

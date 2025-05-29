@@ -1,0 +1,17 @@
+.logo-container {
+  background-image: url('../images/home-bg2.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.home-logo {
+    width: 400px;
+}
