@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Login.css';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -8,6 +8,16 @@ const Login = () => {
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // 페이지 로드시 저장된 ID 불러오기
+  useEffect(() => {
+    const savedId = localStorage.getItem('savedId');
+    if (savedId) {
+      setId(savedId);
+      setRememberMe(true);
+    }
+  }, []);
 
   const togglePassword = () => {
     setShowPassword((prev) => !prev);
@@ -15,6 +25,14 @@ const Login = () => {
 
   const login = (e) => {
     e.preventDefault();
+
+    // 아이디 저장 여부에 따라 localStorage 업데이트
+    if (rememberMe) {
+      localStorage.setItem('savedId', id);
+    } else {
+      localStorage.removeItem('savedId');
+    }
+
     fetch("http://localhost:8080/login", {
       method: 'POST',
       headers: {
@@ -24,9 +42,9 @@ const Login = () => {
     })
       .then(res => res.json())
       .then(res => {
-        if (res.success == true) {
+        if (res.success === true) {
           console.log(res);
-          sessionStorage.setItem("name", res.name); // Login.jsx의 id가 아니라 res.id를 받아와서 저장하도록 하자
+          sessionStorage.setItem("name", res.name);
           alert("Login Response Success");
           navigate('/select');
         } else {
@@ -70,7 +88,12 @@ const Login = () => {
         </div>
 
         <div className="login-form-group login-check">
-          <input type="checkbox" id="remember-check" />
+          <input
+            type="checkbox"
+            id="remember-check"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
           <label htmlFor="remember-check">아이디 저장하기</label>
         </div>
 

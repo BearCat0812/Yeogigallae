@@ -4,19 +4,29 @@ import { useNavigate } from 'react-router-dom';
 import './Select.css';
 
 const indoorOptions = [
+  { id: 'gourmet', label: '맛집' },
   { id: 'cafe', label: '카페' },
   { id: 'restaurant', label: '레스토랑' },
   { id: 'museum', label: '미술관/박물관' },
   { id: 'movie', label: '영화관' },
   { id: 'exhibition', label: '전시회' },
+  { id: 'boardgame_cafe', label: '보드게임 카페' },
+  { id: 'karaoke', label: '노래방' },
+  { id: 'cooking_class', label: '요리 교실' },
+  { id: 'spa', label: '스파/찜질방' },
 ];
 
 const outdoorOptions = [
   { id: 'park', label: '공원' },
-  { id: 'street', label: '거리 산책' },
   { id: 'beach', label: '해변' },
   { id: 'festival', label: '축제' },
   { id: 'hiking', label: '등산' },
+  { id: 'botanical_garden', label: '식물원' },
+  { id: 'zoo', label: '동물원' },
+  { id: 'picnic_spot', label: '피크닉 장소' },
+  { id: 'outdoor_cafe', label: '야외 카페' },
+  { id: 'theme_park', label: '테마파크' },
+  { id: 'farm', label: '체험 농장' },
 ];
 
 const Select = () => {
