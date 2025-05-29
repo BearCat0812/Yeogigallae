@@ -16,12 +16,12 @@ const Home = () => {
           <div>
             <div className="overlay">
               <ul>
-                <li>카페 온화</li>
-                <li>서울 마포구 연남로 12길 30</li>
+                <li>피크니크 홍대경의선숲길점</li>
+                <li>서울 마포구 서강로 13길 24</li>
               </ul>
               <span><i className="fa-solid fa-location-arrow"></i></span>
             </div>
-            <Link to="/" className="card-section"><img src="/images/1.jpg" alt="카페 온화" /></Link>
+            <Link to="/" className="card-section"><img src="/images/1.jpg" alt="피크니크 홍대경의선숲길점" /></Link>
           </div>
 
           <div>

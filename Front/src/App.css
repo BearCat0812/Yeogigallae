@@ -12,6 +12,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Italic';
+  src: url('./assets/fonts/font6.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
   font-family: 'Default', sans-serif;
   padding: 0;

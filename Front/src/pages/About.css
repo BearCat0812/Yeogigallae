@@ -1,0 +1,86 @@
+.about-box {
+    width: 100%;
+    min-height: 800px;
+    background: red;
+    display: flex;
+}
+
+.about-box-left {
+    width: 50%;
+    min-height: 100%;
+    background: url('/images/about-box-bg.png');
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.box-img {
+    overflow: hidden;
+    width: 40%;
+    height: 50%;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    z-index: 2;
+}
+
+.box-img > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.box-img-shadow {
+    width: 50%;
+    height: 60%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    background-color: #fff;
+    z-index: 1;
+}
+
+.about-box-right {
+    width: 50%;
+    min-height: 100%;
+    background: #222;
+    padding: 100px;
+}
+
+.about-box-right * {
+    line-height: 1;
+    color: #fff;
+}
+
+.italic {
+    font-family: 'Italic', sans-serif;
+    font-size: 40px;
+    margin-bottom: 30px;
+    color: rgb(255, 255, 173);
+}
+
+.placeName {
+    font-family: 'Bold', sans-serif;
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+.address {
+    font-size: 25px;
+    margin-bottom: 40px;
+}
+
+.placeEx {
+    overflow: hidden;
+}
+
+.placeEx > pre {
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 20px;
+    width: 100%;
+    height: auto;
+}
