@@ -88,7 +88,7 @@ const Select = () => {
   return (
     <div className="select-container container">
       <p className="select-hello">{sessionStorage.getItem('name')}님, 안녕하세요!</p>
-      <p className="selectbar-container-label">현재 거주하시는 지역은 어디인가요?</p>
+      <p className="selectbar-container-label">설레는 하루, 어디서 만날까요?</p>
       <div className="selectbar-container">
         {[
           { id: 'hongdae', label: '홍대/합정/마포/서대문' },
@@ -149,7 +149,7 @@ const Select = () => {
             <p className="selectbar-container-label" style={{ whiteSpace: 'pre-line' }}>
               {dateType === 'inside'
                 ? '실내를 선택하셨어요!\n선호하는 장소를 최대 2가지 설정할 수 있어요.'
-                : '실외를 선택하셨어요!\n가고 싶은 장소를 최대 2가지 선택해주세요.'}
+                : '실외를 선택하셨어요!\n선호하는 장소를 최대 2가지 설정할 수 있어요.'}
             </p>
             <div className="selectbar-container">
               {(dateType === 'inside' ? indoorOptions : outdoorOptions).map(({ id, label }) => {

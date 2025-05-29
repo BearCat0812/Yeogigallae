@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
 
   const [id, setId] = useState('');
@@ -43,12 +43,12 @@ const Login = () => {
       .then(res => res.json())
       .then(res => {
         if (res.success === true) {
-          console.log(res);
           sessionStorage.setItem("name", res.name);
-          alert("Login Response Success");
+          setIsLoggedIn(true);
+          alert(`${res.name}님, 환영합니다!`);
           navigate('/select');
         } else {
-          alert("Login Failed..");
+          alert("정확한 아이디/패스워드를 입력해주세요.");
         }
       });
   };

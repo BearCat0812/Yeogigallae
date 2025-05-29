@@ -2,15 +2,28 @@ import React from 'react';
 import './Header.css';
 import { useNavigate } from 'react-router-dom';
 
-const Header = () => {
+const Header = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("name");
+    setIsLoggedIn(false); // 로그아웃 처리
+    alert("로그아웃 되었습니다.");
+    navigate('/');
+  };
 
   return (
     <div className="header-container">
-      <img src="/images/logoS.png" alt="logo" className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}/>
+      <img src="/images/logoS.png" alt="logo" onClick={() => navigate('/')} className="logo"/>
       <button className="search-btn"><i className="fa-solid fa-magnifying-glass"></i></button>
-      <button className="login-btn" onClick={() => navigate('/login')}>로그인/회원가입</button>
-      <button className="mypage-btn" onClick={() => navigate('/mypage')}>마이페이지</button>
+      {!isLoggedIn ? (
+        <button className="login-btn" onClick={() => navigate('/login')}>로그인/회원가입</button>
+      ) : (
+        <>
+          <button className="login-btn" onClick={handleLogout}>로그아웃</button>
+          <button className="mypage-btn" onClick={() => navigate('/mypage')}>마이페이지</button>
+        </>
+      )}
     </div>
   );
 };
