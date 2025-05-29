@@ -18,12 +18,23 @@ async function registData(name, email, id, pw, tel) {
     const rows = await conn.query('SELECT id, pw FROM users WHERE id = ?', [id]);
 
     if (rows.length == 0 || rows[0].id !== id) {
-        conn.query("INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)", [name, email, id, pw, tel]);
-        console.log("회원가입 성공");
+        if (name !== "" && email !== "" && id !== "" && pw !== "" && tel !== "") {
+            conn.query("INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)", [name, email, id, pw, tel]);
+            console.log("회원가입 성공");
+            conn.release();
+
+            return true;
+
+        } else {
+            console.log("회원가입 실패");
+            return false;
+        }
     } else {
         console.log("이미 존재하는 아이디 입니다.");
+        conn.release();
+
+        return false;
     }
-    conn.release();
 }
 
 async function login(id, pw) {
@@ -33,7 +44,7 @@ async function login(id, pw) {
         if (pw === rows[0].pw) {
             console.log("로그인 성공");
             conn.release();
-            
+
             return true;
         } else {
             console.log("비밀번호가 다릅니다");
@@ -55,13 +66,46 @@ async function searchIdToName(id) {
     return rows[0].name;
 }
 
+async function compareData(id) {
+    let conn = await pool.getConnection();
+    const rows = await conn.query('SELECT id FROM users WHERE id = ?', [id]);
+    conn.release();
+
+    if (rows[0] === undefined) {
+        return false;
+    } else {
+        return rows[0].id
+    }
+}
+
 app.use(express.json());
 app.use(cors());
 
 app.post('/regist', async (req, res) => {
-    const { name, email, id, pw, tel } = req.body;
-    registData(name, email, id, pw, tel);
-    res.json({ success: true });
+    const { stat } = req.body;
+    if (stat == "idCompare") {
+        const { id } = req.body;
+        const comp = await compareData(id);
+
+        if (comp != false) {
+            return res.json({ success: true, id: comp });
+        } else {
+            return res.json({ success: false })
+        }
+
+    } else if (stat == "register") {
+        const { name, email, id, pw, tel } = req.body;
+        const reg = await registData(name, email, id, pw, tel);
+
+        console.log(reg);
+
+        if (reg == true) {
+            return res.json({ success: true, id: id });
+        } else {
+            return res.json({ success: false });
+        }
+
+    }
 })
 
 app.post('/login', async (req, res) => {
@@ -69,12 +113,12 @@ app.post('/login', async (req, res) => {
     const check = await login(id, pw);
     const name = await searchIdToName(id);
     if (check == true) {
-        return res.json({ success: true, id: id, name: name });
+        return res.status(200).json({ success: true, id: id, name: name });
     } else {
-        return res.status(200).json({ success: false });
+        return res.status(401).json({ success: false });
     }
 })
 
 app.listen(8080, () => {
-    console.log('서버 실행 중');
+    console.log('서버 실행 중...');
 });

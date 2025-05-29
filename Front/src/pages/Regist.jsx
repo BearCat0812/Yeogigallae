@@ -35,7 +35,8 @@ const Regist = () => {
     ERROR_MESSAGES: {
       ID: {
         INVALID: '6~20자의 영문 소문자와 숫자만 사용 가능합니다',
-        SUCCESS: '사용 가능한 아이디입니다'
+        SUCCESS: '사용 가능한 아이디입니다',
+        FAIL: '이미 존재하는 아이디입니다'
       },
       PASSWORD: '8~20자의 영문, 숫자, 특수문자를 모두 포함한 비밀번호를 입력해주세요',
       PASSWORD_CONFIRM: {
@@ -57,14 +58,6 @@ const Regist = () => {
       setEmail('');
     }
   }, [emailId, emailDomain]);
-
-  const validateId = id => {
-    if (CONFIG.REGEX.ID.test(id)) {
-      setErrors(prev => ({ ...prev, id: CONFIG.ERROR_MESSAGES.ID.SUCCESS }));
-    } else {
-      setErrors(prev => ({ ...prev, id: CONFIG.ERROR_MESSAGES.ID.INVALID }));
-    }
-  };
 
   const validatePassword = pw => {
     if (CONFIG.REGEX.PASSWORD.test(pw)) {
@@ -111,13 +104,38 @@ const Regist = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name, email, id, pw, tel })
+      body: JSON.stringify({ name, email, id, pw, tel, stat: "register" })
     })
       .then(res => res.json())
       .then(res => {
         if (res.success) {
           alert("Regist Response Success");
           navigate('/login');
+        } else {
+          alert("모든 정보를 입력해 주세요");
+        }
+      });
+  }
+
+  function idCompare(e) {
+    e.preventDefault();
+    fetch("http://localhost:8080/regist", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id, stat: "idCompare" })
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (res.id == id) {
+          setErrors(prev => ({ ...prev, id: CONFIG.ERROR_MESSAGES.ID.FAIL }));
+        } else {
+          if (CONFIG.REGEX.ID.test(id)) {
+            setErrors(prev => ({ ...prev, id: CONFIG.ERROR_MESSAGES.ID.SUCCESS }));
+          } else {
+            setErrors(prev => ({ ...prev, id: CONFIG.ERROR_MESSAGES.ID.INVALID }));
+          }
         }
       });
   }
@@ -149,10 +167,12 @@ const Regist = () => {
               type="text"
               id="id"
               placeholder="아이디를 입력하세요"
-              onBlur={e => validateId(e.target.value)}
+              /* 배경 클릭 시 아이디 비교 */
+              // onBlur={idCompare}
               onChange={e => setId(e.target.value)}
             />
-            <button className="duplicate-check-btn" type="button">중복 확인</button>
+            {/* 버튼 클릭 시 아이디 비교 */}
+            <button className="duplicate-check-btn" type="button" onClick={idCompare}>중복 확인</button>
           </div>
           <div className="error-msg">{errors.id}</div>
         </div>
