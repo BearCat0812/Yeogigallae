@@ -17,33 +17,33 @@ const options = {
     ],
     places: {
         inside: [
-        { id: 'gourmet', label: '맛집' },
-        { id: 'cafe', label: '카페' },
-        { id: 'restaurant', label: '레스토랑' },
-        { id: 'museum', label: '미술관/박물관' },
-        { id: 'movie', label: '영화관' },
-        { id: 'exhibition', label: '전시회' },
-        { id: 'boardgame_cafe', label: '보드게임 카페' },
-        { id: 'karaoke', label: '노래방' },
-        { id: 'cooking_class', label: '요리 교실' },
-        { id: 'spa', label: '스파/찜질방' },
+            { id: 'gourmet', label: '맛집' },
+            { id: 'cafe', label: '카페' },
+            { id: 'restaurant', label: '레스토랑' },
+            { id: 'museum', label: '미술관/박물관' },
+            { id: 'movie', label: '영화관' },
+            { id: 'exhibition', label: '전시회' },
+            { id: 'boardgame_cafe', label: '보드게임 카페' },
+            { id: 'karaoke', label: '노래방' },
+            { id: 'cooking_class', label: '요리 교실' },
+            { id: 'spa', label: '스파/찜질방' },
         ],
         outside: [
-        { id: 'park', label: '공원' },
-        { id: 'beach', label: '해변' },
-        { id: 'festival', label: '축제' },
-        { id: 'hiking', label: '등산' },
-        { id: 'botanical_garden', label: '식물원' },
-        { id: 'zoo', label: '동물원' },
-        { id: 'picnic_spot', label: '피크닉 장소' },
-        { id: 'outdoor_cafe', label: '야외 카페' },
-        { id: 'theme_park', label: '테마파크' },
-        { id: 'farm', label: '체험 농장' },
+            { id: 'park', label: '공원' },
+            { id: 'beach', label: '해변' },
+            { id: 'festival', label: '축제' },
+            { id: 'hiking', label: '등산' },
+            { id: 'botanical_garden', label: '식물원' },
+            { id: 'zoo', label: '동물원' },
+            { id: 'picnic_spot', label: '피크닉 장소' },
+            { id: 'outdoor_cafe', label: '야외 카페' },
+            { id: 'theme_park', label: '테마파크' },
+            { id: 'farm', label: '체험 농장' },
         ],
     },
-    };
+};
 
-    const Filter = () => {
+const Filter = () => {
     const [region, setRegion] = useState('');
     const [dateType, setDateType] = useState('');
     const [places, setPlaces] = useState([]);
@@ -52,7 +52,7 @@ const options = {
 
     useEffect(() => {
         const handleClickOutside = e => {
-        if (ref.current && !ref.current.contains(e.target)) setVisible(false);
+            if (ref.current && !ref.current.contains(e.target)) setVisible(false);
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -60,101 +60,110 @@ const options = {
 
     const handlePlace = id =>
         setPlaces(prev =>
-        prev.includes(id) ? prev.filter(p => p !== id) : prev.length < 2 ? [...prev, id] : prev
+            prev.includes(id) ? prev.filter(p => p !== id) : prev.length < 2 ? [...prev, id] : prev
         );
 
-    const handleSubmit = e => {
-        e.preventDefault();
+    const handleSubmit = () => {
         if (!region || !dateType || places.length === 0) return alert('모든 항목을 선택해주세요.');
         sessionStorage.setItem('datePreferences', JSON.stringify({ region, dateType, places }));
         alert('필터가 저장되었습니다!');
+
+        fetch("http://localhost:8080/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ region, dateType, places })
+        })
+            .then(res => res.json());
+            // .then()
     };
 
     const renderRadioGroup = (name, items, value, onChange) =>
         items.map(({ id, label }) => (
-        <label key={id} className={`radio-label ${value === id ? 'checked' : ''}`}>
-            <input
-            type="radio"
-            name={name}
-            value={id}
-            checked={value === id}
-            onChange={() => onChange(id)}
-            onClick={e => {
-                if (value === id) {
-                e.preventDefault();
-                onChange('');
-                }
-            }}
-            />
-            <span>{label}</span>
-        </label>
+            <label key={id} className={`radio-label ${value === id ? 'checked' : ''}`}>
+                <input
+                    type="radio"
+                    name={name}
+                    value={id}
+                    checked={value === id}
+                    onChange={() => onChange(id)}
+                    onClick={e => {
+                        if (value === id) {
+                            e.preventDefault();
+                            onChange('');
+                        }
+                    }}
+                />
+                <span>{label}</span>
+            </label>
         ));
 
     const renderCheckboxGroup = items =>
         items.map(({ id, label }) => (
-        <label key={id} className={`radio-label ${places.includes(id) ? 'checked' : ''}`}>
-            <input type="checkbox" checked={places.includes(id)} onChange={() => handlePlace(id)} />
-            <span>{label}</span>
-        </label>
+            <label key={id} className={`radio-label ${places.includes(id) ? 'checked' : ''}`}>
+                <input type="checkbox" checked={places.includes(id)} onChange={() => handlePlace(id)} />
+                <span>{label}</span>
+            </label>
         ));
 
     return (
         <div className="container" ref={ref}>
-        <div className="search-container">
-            <form onSubmit={handleSubmit}>
-            <label htmlFor="search">
-                <i className="fa-solid fa-magnifying-glass"></i>
-            </label>
-            <input
-                id="search"
-                type="text"
-                placeholder="지금 딱, 가고 싶은 데이트 장소는?"
-                onFocus={() => setVisible(true)}
-            />
-            </form>
-        </div>
+            <div className="search-container">
+                <form onSubmit={handleSubmit}>
+                    <label htmlFor="search">
+                        <i className="fa-solid fa-magnifying-glass"></i>
+                    </label>
+                    <input
+                        id="search"
+                        type="text"
+                        placeholder="지금 딱, 가고 싶은 데이트 장소는?"
+                        onFocus={() => setVisible(true)}
+                    />
+                </form>
+            </div>
 
-        <AnimatePresence>
-            {visible && (
-            <motion.div
-                className="filter-container"
-                initial={{ height: 0 }}
-                animate={{ height: 'auto' }}
-                exit={{ height: 20, opacity: 0 }}
-                transition={{ duration: 0.4 }}
-            >
-                <div className="filter-container-padding">
-                <div className="filter-group-container">
-                    <h1 className="filter-name">지역 선택</h1>
-                    <div className="filter-group">
-                    {renderRadioGroup('region', options.region, region, setRegion)}
-                    </div>
-                </div>
+            <AnimatePresence>
+                {visible && (
+                    <motion.div
+                        className="filter-container"
+                        initial={{ height: 0 }}
+                        animate={{ height: 'auto' }}
+                        exit={{ height: 20, opacity: 0 }}
+                        transition={{ duration: 0.4 }}
+                    >
+                        <div className="filter-container-padding">
+                            <div className="filter-group-container">
+                                <h1 className="filter-name">지역 선택</h1>
+                                <div className="filter-group">
+                                    {renderRadioGroup('region', options.region, region, setRegion)}
+                                </div>
+                            </div>
 
-                <div className="filter-group-container">
-                    <h1 className="filter-name">실내/실외</h1>
-                    <div className="filter-group">
-                    {renderRadioGroup('dateType', options.dateType, dateType, id => {
-                        setDateType(id);
-                        setPlaces([]);
-                    })}
-                    </div>
-                </div>
+                            <div className="filter-group-container">
+                                <h1 className="filter-name">실내/실외</h1>
+                                <div className="filter-group">
+                                    {renderRadioGroup('dateType', options.dateType, dateType, id => {
+                                        setDateType(id);
+                                        setPlaces([]);
+                                    })}
+                                </div>
+                            </div>
 
-                {dateType && (
-                    <div className="filter-group-container">
-                    <h1 className="filter-name">장소 선택 (최대 2개)</h1>
-                    <div className="filter-group group-place">{renderCheckboxGroup(options.places[dateType])}</div>
-                    </div>
+                            {dateType && (
+                                <div className="filter-group-container">
+                                    <h1 className="filter-name">장소 선택 (최대 2개)</h1>
+                                    <div className="filter-group group-place">{renderCheckboxGroup(options.places[dateType])}</div>
+                                </div>
+                            )}
+
+                            <button className="filter-submit" onClick={handleSubmit}>
+                                검색
+                            </button>
+                        </div>
+                    </motion.div>
                 )}
-
-                <button className="filter-submit" onClick={handleSubmit}>
-                    검색
-                </button>
-                </div>
-            </motion.div>
-            )}
-        </AnimatePresence>
+            </AnimatePresence>
         </div>
     );
 };

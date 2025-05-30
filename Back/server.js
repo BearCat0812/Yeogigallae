@@ -82,6 +82,21 @@ async function compareData(id) {
     }
 }
 
+async function print(region, dateType, places) {
+    let conn = await pool.getConnection();
+    const place1 = "";
+    const place2 = "";
+    if (places.length == 2) {
+        const rows = await conn.query('SELECT region,placeName,address,dateType,place FROM database WHERE region = ? AND dateType = ? AND (place = ? OR place = ?)', [region, dateType, places[0], places[1]]);
+        conn.release();
+        return rows;
+    } else {
+        const rows = await conn.query('SELECT region,placeName,address,dateType,place FROM database WHERE region = ? AND dateType = ? AND place = ?', [region, dateType, places[0]]);
+        conn.release();
+        return rows;
+    }
+}
+
 const hashingPw = async (pw) => {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
@@ -138,6 +153,13 @@ app.post('/login', async (req, res) => {
     } else {
         return res.status(401).json({ success: false });
     }
+})
+
+app.post('/', async (req, res) => {
+    const { region, dateType, places } = req.body;
+    const result = await print(region, dateType, places);
+
+    return res.json(result);
 })
 
 app.listen(8080, () => {
