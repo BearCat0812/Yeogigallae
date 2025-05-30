@@ -15,7 +15,6 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
   return (
     <div className="header-container">
       <img src="/images/logoS.png" alt="logo" onClick={() => navigate('/')} className="logo"/>
-      <button className="search-btn"><i className="fa-solid fa-magnifying-glass"></i></button>
       {!isLoggedIn ? (
         <button className="login-btn" onClick={() => navigate('/login')}>로그인/회원가입</button>
       ) : (

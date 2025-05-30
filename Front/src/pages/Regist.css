@@ -110,10 +110,6 @@ form.regist-form > h1 {
     font-size: 13px;
 }
 
-#info__id > button.duplicate-check-btn:hover {
-    filter: brightness(0.9);
-}
-
 #info__pw,
 #info__pwRe {
     position: relative;
@@ -187,10 +183,6 @@ form.regist-form > h1 {
     padding: 15px;
     cursor: pointer;
     border-radius: 6px;
-}
-
-.regist-button:hover {
-    filter: brightness(0.9);
 }
 
 * {

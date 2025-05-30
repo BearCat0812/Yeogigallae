@@ -12,14 +12,8 @@
     height: 20px;
 }
 
-.search-btn {
-    background: transparent;
-    border: none;
-    margin-left: auto;
-    margin-right: 30px;
-}
-
 .login-btn {
+    margin-left: auto;
     background: transparent;
     border: none;
     margin-right: 30px;

@@ -9,6 +9,7 @@ import Regist from './pages/Regist.jsx';
 import MyPage from './pages/MyPage.jsx';
 import Select from './pages/Select.jsx';
 import About from './pages/About.jsx';
+import ScrollToTop from './ScrollToTop';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,6 +24,7 @@ function App() {
 
   return (
     <div>
+      <ScrollToTop />
       <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       <Routes>
         <Route path="/" element={<Home />} />

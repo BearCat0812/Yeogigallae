@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import './Filter.css';
 
 const options = {
@@ -40,27 +41,37 @@ const options = {
         { id: 'farm', label: '체험 농장' },
         ],
     },
-};
+    };
 
-const Filter = () => {
+    const Filter = () => {
     const [region, setRegion] = useState('');
     const [dateType, setDateType] = useState('');
     const [places, setPlaces] = useState([]);
+    const [visible, setVisible] = useState(false);
+    const ref = useRef(null);
 
-    const togglePlace = (id) => {
-        setPlaces((prev) =>
-        prev.includes(id) ? prev.filter((p) => p !== id) : prev.length < 2 ? [...prev, id] : prev
+    useEffect(() => {
+        const handleClickOutside = e => {
+        if (ref.current && !ref.current.contains(e.target)) setVisible(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handlePlace = id =>
+        setPlaces(prev =>
+        prev.includes(id) ? prev.filter(p => p !== id) : prev.length < 2 ? [...prev, id] : prev
         );
-    };
 
-    const handleSubmit = () => {
+    const handleSubmit = e => {
+        e.preventDefault();
         if (!region || !dateType || places.length === 0) return alert('모든 항목을 선택해주세요.');
         sessionStorage.setItem('datePreferences', JSON.stringify({ region, dateType, places }));
         alert('필터가 저장되었습니다!');
     };
 
     const renderRadioGroup = (name, items, value, onChange) =>
-    items.map(({ id, label }) => (
+        items.map(({ id, label }) => (
         <label key={id} className={`radio-label ${value === id ? 'checked' : ''}`}>
             <input
             type="radio"
@@ -68,51 +79,84 @@ const Filter = () => {
             value={id}
             checked={value === id}
             onChange={() => onChange(id)}
+            onClick={e => {
+                if (value === id) {
+                e.preventDefault();
+                onChange('');
+                }
+            }}
             />
             <span>{label}</span>
         </label>
-    ));
+        ));
+
+    const renderCheckboxGroup = items =>
+        items.map(({ id, label }) => (
+        <label key={id} className={`radio-label ${places.includes(id) ? 'checked' : ''}`}>
+            <input type="checkbox" checked={places.includes(id)} onChange={() => handlePlace(id)} />
+            <span>{label}</span>
+        </label>
+        ));
 
     return (
-    <div className="filter-container container">
-        <div className="filter-group-container">
-            <h1 className="filter-name">지역 선택</h1>
-            <div className="filter-group">
-                {renderRadioGroup('region', options.region, region, setRegion)}
-            </div>
+        <div className="container" ref={ref}>
+        <div className="search-container">
+            <form onSubmit={handleSubmit}>
+            <label htmlFor="search">
+                <i className="fa-solid fa-magnifying-glass"></i>
+            </label>
+            <input
+                id="search"
+                type="text"
+                placeholder="지금 딱, 가고 싶은 데이트 장소는?"
+                onFocus={() => setVisible(true)}
+            />
+            </form>
         </div>
 
-        <div className="filter-group-container">
-            <h1 className="filter-name">실내/실외</h1>
-            <div className="filter-group">
-                {renderRadioGroup('dateType', options.dateType, dateType, (val) => {
-                setDateType(val);
-                setPlaces([]);
-                })}
-            </div>
-        </div>
-
-        <div className="filter-group-container">
-            <h1 className="filter-name">장소 선택 (최대 2개)</h1>
-            {dateType && (
-                <div className="filter-group group-place">
-                {options.places[dateType].map(({ id, label }) => (
-                    <label key={id} className={`radio-label ${places.includes(id) ? 'checked' : ''}`}>
-                    <input
-                        type="checkbox"
-                        checked={places.includes(id)}
-                        onChange={() => togglePlace(id)}
-                    />
-                    <span>{label}</span>
-                    </label>
-                ))}
+        <AnimatePresence>
+            {visible && (
+            <motion.div
+                className="filter-container"
+                initial={{ height: 0 }}
+                animate={{ height: 'auto' }}
+                exit={{ height: 20, opacity: 0 }}
+                transition={{ duration: 0.4 }}
+            >
+                <div className="filter-container-padding">
+                <div className="filter-group-container">
+                    <h1 className="filter-name">지역 선택</h1>
+                    <div className="filter-group">
+                    {renderRadioGroup('region', options.region, region, setRegion)}
+                    </div>
                 </div>
-            )}
-        </div>
 
-        <button className="filter-submit" onClick={handleSubmit}>검색</button>
-    </div>
-  );
+                <div className="filter-group-container">
+                    <h1 className="filter-name">실내/실외</h1>
+                    <div className="filter-group">
+                    {renderRadioGroup('dateType', options.dateType, dateType, id => {
+                        setDateType(id);
+                        setPlaces([]);
+                    })}
+                    </div>
+                </div>
+
+                {dateType && (
+                    <div className="filter-group-container">
+                    <h1 className="filter-name">장소 선택 (최대 2개)</h1>
+                    <div className="filter-group group-place">{renderCheckboxGroup(options.places[dateType])}</div>
+                    </div>
+                )}
+
+                <button className="filter-submit" onClick={handleSubmit}>
+                    검색
+                </button>
+                </div>
+            </motion.div>
+            )}
+        </AnimatePresence>
+        </div>
+    );
 };
 
 export default Filter;
