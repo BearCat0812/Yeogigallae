@@ -87,11 +87,11 @@ async function print(region, dateType, places) {
     const place1 = "";
     const place2 = "";
     if (places.length == 2) {
-        const rows = await conn.query('SELECT region,placeName,address,dateType,place FROM database WHERE region = ? AND dateType = ? AND (place = ? OR place = ?)', [region, dateType, places[0], places[1]]);
+        const rows = await conn.query('SELECT region,placeName,address,dateType,place,imgName FROM database WHERE region = ? AND dateType = ? AND (place = ? OR place = ?)', [region, dateType, places[0], places[1]]);
         conn.release();
         return rows;
     } else {
-        const rows = await conn.query('SELECT region,placeName,address,dateType,place FROM database WHERE region = ? AND dateType = ? AND place = ?', [region, dateType, places[0]]);
+        const rows = await conn.query('SELECT region,placeName,address,dateType,place,imgName FROM database WHERE region = ? AND dateType = ? AND place = ?', [region, dateType, places[0]]);
         conn.release();
         return rows;
     }

@@ -90,3 +90,7 @@
     object-fit: cover;
     border-radius: 20px;
 }
+
+p.no-results {
+  font-size: 25px;  
+}

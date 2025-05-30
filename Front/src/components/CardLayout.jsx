@@ -2,65 +2,62 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './CardLayout.css';
 
-const dummyCards = Array.from({ length: 20 }, (_, i) => ({
-  name: `place ${i + 4}`,
-  address: `address ${i + 4}`,
-  image: '/images/dummy.jpg',
-  link: '/'
-}));
-
-const allPlaces = [
-  {
-    name: '피크니크 홍대경의선숲길점',
-    address: '서울 마포구 서강로 13길 24',
-    image: '/images/1.jpg',
-    link: '/about'
-  },
-  {
-    name: 'LOVEPEACEMAUM',
-    address: '서울 마포구 포은로5길 3',
-    image: '/images/2.jfif',
-    link: '/'
-  },
-  {
-    name: '바이앤드커피',
-    address: '서울 마포구 잔다리로3안길 44 2층',
-    image: '/images/3.jpg',
-    link: '/'
-  },
-  ...dummyCards
-];
-
 const CardLayout = () => {
+  const [cards, setCards] = useState([]);
   const [count, setCount] = useState(12);
   const loaderRef = useRef();
 
   useEffect(() => {
+    const preferences = sessionStorage.getItem('datePreferences');
+    if (!preferences) return;
+
+    const { region, dateType, places } = JSON.parse(preferences);
+
+    fetch('http://localhost:8080/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ region, dateType, places })
+    })
+      .then(res => res.json())
+      .then(data => {
+        // placeName과 imgName을 사용하는 응답에 맞게 처리
+        setCards(data);
+      })
+      .catch(err => {
+        console.error('데이터 불러오기 실패:', err);
+      });
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => entry.isIntersecting && setCount(c => Math.min(c + 6, allPlaces.length)),
+      ([entry]) => entry.isIntersecting && setCount(c => Math.min(c + 6, cards.length)),
       { threshold: 1 }
     );
     const el = loaderRef.current;
     if (el) observer.observe(el);
     return () => el && observer.unobserve(el);
-  }, []);
+  }, [cards]);
 
   return (
     <div className="container section-container">
       <p>당신의 하루를<br />설레게 할 장소를 소개할게요</p>
       <div className="section">
-        {allPlaces.slice(0, count).map((p, i) => (
-          <div key={i}>
-            <div className="overlay">
-              <ul><li>{p.name}</li><li>{p.address}</li></ul>
-              <span><i className="fa-solid fa-location-arrow"></i></span>
+        {cards.length === 0 ? (
+          <p className="no-results">설렘을 줄 장소를 찾지 못했어요<br />다시 한 번 골라볼까요?</p>
+        ) : (
+          cards.slice(0, count).map((p, i) => (
+            <div key={i}>
+              <div className="overlay">
+                <ul><li>{p.placeName}</li><li>{p.address}</li></ul>
+                <span><i className="fa-solid fa-location-arrow"></i></span>
+              </div>
+              <Link to={p.link} className="card-section">
+                <img src={'/dbImages/' + p.imgName} alt={p.placeName} />
+              </Link>
             </div>
-            <Link to={p.link} className="card-section">
-              <img src={p.image} alt={p.name} />
-            </Link>
-          </div>
-        ))}
-        {count < allPlaces.length && <div ref={loaderRef} style={{ height: 50 }} />}
+          ))
+        )}
+        {count < cards.length && <div ref={loaderRef} style={{ height: 50 }} />}
       </div>
     </div>
   );
