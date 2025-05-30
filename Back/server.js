@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const expressSession = require('express-session');
+const cookieParser = require('cookie-parser');
 
 const pool = mariadb.createPool({
     host: "192.168.0.191",
@@ -88,6 +90,12 @@ const hashingPw = async (pw) => {
 
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
+app.use(expressSession({
+    secret: 'KEY',
+    resave: false,
+    saveUninitialized: true
+}));
 
 app.post('/regist', async (req, res) => {
     const { stat } = req.body;
