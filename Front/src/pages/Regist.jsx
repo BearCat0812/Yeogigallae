@@ -15,6 +15,7 @@ const Regist = () => {
   const [pw, setPw] = useState('');
   const [pwRe, setPwRe] = useState('');
   const [tel, setTel] = useState('');
+  const [ok, setOk] = useState(1);
 
   const [pwVisible, setPwVisible] = useState(false);
   const [pwReVisible, setPwReVisible] = useState(false);
@@ -104,7 +105,7 @@ const Regist = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name, email, id, pw, tel, stat: "register" })
+      body: JSON.stringify({ name, email, id, pw, tel, stat: "register", ok })
     })
       .then(res => res.json())
       .then(res => {
@@ -112,7 +113,7 @@ const Regist = () => {
           alert("Regist Response Success");
           navigate('/login');
         } else {
-          alert("모든 정보를 입력해 주세요");
+          alert("다시 확인해 주세요");
         }
       });
   }
@@ -128,12 +129,15 @@ const Regist = () => {
     })
       .then(res => res.json())
       .then(res => {
-        if (res.id == id) {
+        if (res.duplicateCheck == 1) {
+          setOk(1);
           setErrors(prev => ({ ...prev, id: CONFIG.ERROR_MESSAGES.ID.FAIL }));
         } else {
-          if (CONFIG.REGEX.ID.test(id)) {
+          if (res.success == true) {
+            setOk(0);
             setErrors(prev => ({ ...prev, id: CONFIG.ERROR_MESSAGES.ID.SUCCESS }));
           } else {
+            setOk(1);
             setErrors(prev => ({ ...prev, id: CONFIG.ERROR_MESSAGES.ID.INVALID }));
           }
         }

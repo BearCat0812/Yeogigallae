@@ -96,23 +96,28 @@ app.post('/regist', async (req, res) => {
         const comp = await compareData(id);
 
         if (comp != false) {
-            return res.json({ success: true, id: comp });
+            return res.json({ success: false, duplicateCheck: 1 });
         } else {
-            return res.json({ success: false })
+            if (id.length <= 6) {
+                return res.json({ success: false, duplicateCheck: 0 });
+            } else {
+                return res.json({ success: true, duplicateCheck: 0 });
+            }
         }
 
     } else if (stat == "register") {
-        const { name, email, id, pw, tel } = req.body;
-        const reg = await registData(name, email, id, await hashingPw(pw), tel);
+        const { name, email, id, pw, tel, ok } = req.body;
+        if (ok == 0) {
+            const reg = await registData(name, email, id, await hashingPw(pw), tel);
 
-        console.log(reg);
-
-        if (reg == true) {
-            return res.json({ success: true, id: id });
+            if (reg == true) {
+                return res.json({ success: true, id: id });
+            } else {
+                return res.json({ success: false });
+            }
         } else {
             return res.json({ success: false });
         }
-
     }
 })
 
