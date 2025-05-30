@@ -2,6 +2,7 @@ const mariadb = require('mariadb');
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 
 const pool = mariadb.createPool({
     host: "192.168.0.191",
@@ -40,8 +41,9 @@ async function registData(name, email, id, pw, tel) {
 async function login(id, pw) {
     let conn = await pool.getConnection();
     const rows = await conn.query('SELECT id, pw FROM users WHERE id = ?', [id]);
+    const result = await bcrypt.compare(pw, rows[0].pw);
     if (rows.length > 0) {
-        if (pw === rows[0].pw) {
+        if (result == true) {
             console.log("로그인 성공");
             conn.release();
 
@@ -78,6 +80,12 @@ async function compareData(id) {
     }
 }
 
+const hashingPw = async (pw) => {
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    return await bcrypt.hash(pw, salt);
+}
+
 app.use(express.json());
 app.use(cors());
 
@@ -95,7 +103,7 @@ app.post('/regist', async (req, res) => {
 
     } else if (stat == "register") {
         const { name, email, id, pw, tel } = req.body;
-        const reg = await registData(name, email, id, pw, tel);
+        const reg = await registData(name, email, id, await hashingPw(pw), tel);
 
         console.log(reg);
 
