@@ -20,7 +20,7 @@ async function registData(name, email, id, pw, tel) {
 
     if (rows.length == 0 || rows[0].id !== id) {
         if (name !== "" && email !== "" && id !== "" && pw !== "" && tel !== "") {
-            conn.query("INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)", [name, email, id, pw, tel]);
+            await conn.query("INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)", [name, email, id, pw, tel]);
             console.log("회원가입 성공");
             conn.release();
 
