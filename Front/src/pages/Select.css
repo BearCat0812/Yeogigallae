@@ -42,31 +42,11 @@
   position: relative;
   display: inline-block;
   padding: 10px 20px;
-  background-color: #fff;
-  color: #000;
+  background-color: #222;
+  color: #fff;
   border: 1px solid #ddd;
   overflow: hidden;
-  transition: color 0.3s ease;
-  z-index: 0;
   border-radius: 6px;
-}
-
-.submit-button::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; bottom: 0;
-  width: 0%;
-  background-color: #222;
-  z-index: -1;
-  transition: width 0.4s ease;
-}
-
-.submit-button:hover::before {
-  width: 100%;
-}
-
-.submit-button:hover {
-  color: #fff;
 }
 
 .animated-section {
