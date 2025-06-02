@@ -37,6 +37,15 @@
     color: #ddd;
 }
 
+/* 검색창 비활성화 스타일 추가 */
+#search.disabled {
+    cursor: not-allowed;
+    color: #999;
+}
+
+#search.disabled::placeholder {
+    color: #999;
+}
 
 /* 필터창 */
 .filter-container {

@@ -59,6 +59,7 @@ const Filter = () => {
     const [places, setPlaces] = useState([]);
     const [visible, setVisible] = useState(false);
     const ref = useRef(null);
+    const isLoggedIn = sessionStorage.getItem('name'); // 로그인 상태 확인
 
     useEffect(() => {
         const handleClickOutside = e => {
@@ -75,6 +76,10 @@ const Filter = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!isLoggedIn) {
+            alert('로그인이 필요한 서비스입니다.');
+            return;
+        }
 
         if (!region || !dateType || places.length === 0) {
             alert('모든 항목을 선택해주세요.');
@@ -95,6 +100,16 @@ const Filter = () => {
             .finally(() => {
                 window.location.reload();
             });
+    };
+
+    const handleSearchFocus = (e) => {
+        if (!isLoggedIn) {
+            e.preventDefault();
+            e.target.blur(); // 포커스 해제
+            alert('로그인이 필요한 서비스입니다.');
+            return;
+        }
+        setVisible(true);
     };
 
     const renderRadioGroup = (name, items, value, onChange) =>
@@ -135,14 +150,15 @@ const Filter = () => {
                     <input
                         id="search"
                         type="text"
-                        placeholder="지금 딱, 가고 싶은 데이트 장소는?"
-                        onFocus={() => setVisible(true)}
+                        placeholder={isLoggedIn ? "지금 딱, 가고 싶은 데이트 장소는?" : "로그인이 필요한 서비스입니다."}
+                        onFocus={handleSearchFocus}
+                        className={!isLoggedIn ? "disabled" : ""}
                     />
                 </form>
             </div>
 
             <AnimatePresence>
-                {visible && (
+                {visible && isLoggedIn && (
                     <motion.div
                         className="filter-container"
                         initial={{ height: 0 }}

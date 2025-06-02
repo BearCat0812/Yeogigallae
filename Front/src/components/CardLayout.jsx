@@ -9,23 +9,47 @@ const CardLayout = () => {
 
   useEffect(() => {
     const preferences = sessionStorage.getItem('datePreferences');
-    if (!preferences) return;
+    const isLoggedIn = sessionStorage.getItem('name');
 
-    const { region, dateType, places } = JSON.parse(preferences);
+    // 로그아웃 상태일 때는 전체 데이터 가져오기
+    if (!isLoggedIn) {
+      fetch('http://localhost:8080/all')
+        .then(res => res.json())
+        .then(data => {
+          setCards(data);
+        })
+        .catch(err => {
+          console.error('데이터 불러오기 실패:', err);
+        });
+      return;
+    }
 
-    fetch('http://localhost:8080/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ region, dateType, places })
-    })
-      .then(res => res.json())
-      .then(data => {
-        // placeName과 imgName을 사용하는 응답에 맞게 처리
-        setCards(data);
+    // 로그인 상태이고 필터링 설정이 있는 경우
+    if (preferences) {
+      const { region, dateType, places } = JSON.parse(preferences);
+      fetch('http://localhost:8080/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ region, dateType, places })
       })
-      .catch(err => {
-        console.error('데이터 불러오기 실패:', err);
-      });
+        .then(res => res.json())
+        .then(data => {
+          setCards(data);
+        })
+        .catch(err => {
+          console.error('데이터 불러오기 실패:', err);
+        });
+    } else {
+      // 로그인은 했지만 필터링 설정이 없는 경우에도 전체 데이터 표시
+      fetch('http://localhost:8080/all')
+        .then(res => res.json())
+        .then(data => {
+          setCards(data);
+        })
+        .catch(err => {
+          console.error('데이터 불러오기 실패:', err);
+        });
+    }
   }, []);
 
   useEffect(() => {

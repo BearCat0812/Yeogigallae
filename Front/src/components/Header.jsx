@@ -10,6 +10,7 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
     setIsLoggedIn(false); // 로그아웃 처리
     alert("로그아웃 되었습니다.");
     navigate('/');
+    window.location.reload(); // 페이지 새로고침 추가
   };
 
   return (

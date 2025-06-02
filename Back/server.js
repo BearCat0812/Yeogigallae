@@ -103,6 +103,14 @@ const hashingPw = async (pw) => {
     return await bcrypt.hash(pw, salt);
 }
 
+// 전체 데이터를 가져오는 함수 추가
+async function getAllData() {
+    let conn = await pool.getConnection();
+    const rows = await conn.query('SELECT region,placeName,address,dateType,place,imgName FROM database');
+    conn.release();
+    return rows;
+}
+
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
@@ -161,6 +169,12 @@ app.post('/', async (req, res) => {
 
     return res.json(result);
 })
+
+// 새로운 엔드포인트 추가
+app.get('/all', async (req, res) => {
+    const result = await getAllData();
+    return res.json(result);
+});
 
 app.listen(8080, () => {
     console.log('서버 실행 중...');
