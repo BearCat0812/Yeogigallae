@@ -199,7 +199,7 @@ const Filter = () => {
                         type="text"
                         value={searchKeyword}
                         onChange={handleSearchInput}
-                        placeholder={isLoggedIn ? "지금 딱, 가고 싶은 데이트 장소는?" : "회원 전용 기능입니다"}
+                        placeholder={isLoggedIn ? "지금 딱, 가고 싶은 데이트 장소는?" : "회원 가입하고 더 많은 기능을 이용해보세요!"}
                         onFocus={handleSearchFocus}
                         className={!isLoggedIn ? "disabled" : ""}
                         autoComplete="off"
