@@ -8,10 +8,17 @@ const CardLayout = () => {
   const loaderRef = useRef();
 
   useEffect(() => {
+    // 검색 결과가 있는지 확인
+    const searchResults = sessionStorage.getItem('searchResults');
+    if (searchResults) {
+      setCards(JSON.parse(searchResults));
+      sessionStorage.removeItem('searchResults');
+      return;
+    }
+
     const preferences = sessionStorage.getItem('datePreferences');
     const isLoggedIn = sessionStorage.getItem('name');
 
-    // 로그아웃 상태일 때는 전체 데이터 가져오기
     if (!isLoggedIn) {
       fetch('http://localhost:8080/all')
         .then(res => res.json())
@@ -24,13 +31,12 @@ const CardLayout = () => {
       return;
     }
 
-    // 로그인 상태이고 필터링 설정이 있는 경우
     if (preferences) {
-      const { region, dateType, places } = JSON.parse(preferences);
+      const filterData = JSON.parse(preferences);
       fetch('http://localhost:8080/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ region, dateType, places })
+        body: JSON.stringify(filterData)
       })
         .then(res => res.json())
         .then(data => {
@@ -40,7 +46,6 @@ const CardLayout = () => {
           console.error('데이터 불러오기 실패:', err);
         });
     } else {
-      // 로그인은 했지만 필터링 설정이 없는 경우에도 전체 데이터 표시
       fetch('http://localhost:8080/all')
         .then(res => res.json())
         .then(data => {

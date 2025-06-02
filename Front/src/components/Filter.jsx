@@ -58,8 +58,9 @@ const Filter = () => {
     const [dateType, setDateType] = useState('');
     const [places, setPlaces] = useState([]);
     const [visible, setVisible] = useState(false);
+    const [searchKeyword, setSearchKeyword] = useState('');
     const ref = useRef(null);
-    const isLoggedIn = sessionStorage.getItem('name'); // 로그인 상태 확인
+    const isLoggedIn = sessionStorage.getItem('name');
 
     useEffect(() => {
         const handleClickOutside = e => {
@@ -81,12 +82,19 @@ const Filter = () => {
             return;
         }
 
-        if (!region || !dateType || places.length === 0) {
-            alert('모든 항목을 선택해주세요.');
+        // 최소한 하나의 필터 조건이라도 있는지 확인
+        if (!region && !dateType && places.length === 0) {
+            alert('최소한 하나의 조건을 선택해주세요.');
             return;
         }
 
-        sessionStorage.setItem('datePreferences', JSON.stringify({ region, dateType, places }));
+        const filterData = {
+            region: region || null,
+            dateType: dateType || null,
+            places: places.length > 0 ? places : null
+        };
+
+        sessionStorage.setItem('datePreferences', JSON.stringify(filterData));
         alert('필터가 저장되었습니다!');
 
         fetch("http://localhost:8080/", {
@@ -94,7 +102,7 @@ const Filter = () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ region, dateType, places })
+            body: JSON.stringify(filterData)
         })
             .then(res => res.json())
             .finally(() => {
@@ -110,6 +118,38 @@ const Filter = () => {
             return;
         }
         setVisible(true);
+    };
+
+    const handleSearch = async (keyword) => {
+        if (!keyword.trim()) return;
+        
+        try {
+            const response = await fetch(`http://localhost:8080/search?keyword=${encodeURIComponent(keyword)}`);
+            const data = await response.json();
+            
+            // 검색 결과로 받은 데이터를 sessionStorage에 임시 저장
+            sessionStorage.setItem('searchResults', JSON.stringify(data));
+            
+            // 페이지 새로고침하여 CardLayout에서 검색 결과 표시
+            window.location.reload();
+        } catch (error) {
+            console.error('검색 실패:', error);
+        }
+    };
+
+    const handleSearchInput = (e) => {
+        setSearchKeyword(e.target.value);
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (!isLoggedIn) {
+            alert('로그인이 필요한 서비스입니다.');
+            return;
+        }
+        if (searchKeyword.trim()) {
+            handleSearch(searchKeyword);
+        }
     };
 
     const renderRadioGroup = (name, items, value, onChange) =>
@@ -143,14 +183,16 @@ const Filter = () => {
     return (
         <div className="container" ref={ref}>
             <div className="search-container">
-                <form onSubmit={e => handleSubmit(e)}>
-                    <label htmlFor="search">
+                <form onSubmit={handleSearchSubmit}>
+                    <label htmlFor="search" onClick={handleSearchSubmit} style={{ cursor: 'pointer' }}>
                         <i className="fa-solid fa-magnifying-glass"></i>
                     </label>
                     <input
                         id="search"
                         type="text"
-                        placeholder={isLoggedIn ? "지금 딱, 가고 싶은 데이트 장소는?" : "로그인이 필요한 서비스입니다."}
+                        value={searchKeyword}
+                        onChange={handleSearchInput}
+                        placeholder={isLoggedIn ? "지금 딱, 가고 싶은 데이트 장소는?" : "회원 전용 기능입니다"}
                         onFocus={handleSearchFocus}
                         className={!isLoggedIn ? "disabled" : ""}
                     />

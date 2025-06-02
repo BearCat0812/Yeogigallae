@@ -84,16 +84,35 @@ async function compareData(id) {
 
 async function print(region, dateType, places) {
     let conn = await pool.getConnection();
-    const place1 = "";
-    const place2 = "";
-    if (places.length == 2) {
-        const rows = await conn.query('SELECT region,placeName,address,dateType,place,imgName FROM database WHERE region = ? AND dateType = ? AND (place = ? OR place = ?)', [region, dateType, places[0], places[1]]);
-        conn.release();
+    try {
+        let query = 'SELECT region,placeName,address,dateType,place,imgName FROM database WHERE 1=1';
+        const params = [];
+
+        // 각 필터 조건이 있을 때만 WHERE 절에 추가
+        if (region) {
+            query += ' AND region = ?';
+            params.push(region);
+        }
+        
+        if (dateType) {
+            query += ' AND dateType = ?';
+            params.push(dateType);
+        }
+        
+        if (places && places.length > 0) {
+            if (places.length === 1) {
+                query += ' AND place = ?';
+                params.push(places[0]);
+            } else if (places.length === 2) {
+                query += ' AND (place = ? OR place = ?)';
+                params.push(places[0], places[1]);
+            }
+        }
+
+        const rows = await conn.query(query, params);
         return rows;
-    } else {
-        const rows = await conn.query('SELECT region,placeName,address,dateType,place,imgName FROM database WHERE region = ? AND dateType = ? AND place = ?', [region, dateType, places[0]]);
+    } finally {
         conn.release();
-        return rows;
     }
 }
 
@@ -109,6 +128,23 @@ async function getAllData() {
     const rows = await conn.query('SELECT region,placeName,address,dateType,place,imgName FROM database');
     conn.release();
     return rows;
+}
+
+// 검색 기능 추가
+async function searchData(keyword) {
+    let conn = await pool.getConnection();
+    try {
+        const query = `
+            SELECT region, placeName, address, dateType, place, imgName 
+            FROM database 
+            WHERE placeName LIKE ? OR address LIKE ? OR place LIKE ?
+        `;
+        const searchKeyword = `%${keyword}%`;
+        const rows = await conn.query(query, [searchKeyword, searchKeyword, searchKeyword]);
+        return rows;
+    } finally {
+        conn.release();
+    }
 }
 
 app.use(express.json());
@@ -173,6 +209,16 @@ app.post('/', async (req, res) => {
 // 새로운 엔드포인트 추가
 app.get('/all', async (req, res) => {
     const result = await getAllData();
+    return res.json(result);
+});
+
+// 검색 엔드포인트 추가
+app.get('/search', async (req, res) => {
+    const { keyword } = req.query;
+    if (!keyword) {
+        return res.json([]);
+    }
+    const result = await searchData(keyword);
     return res.json(result);
 });
 
