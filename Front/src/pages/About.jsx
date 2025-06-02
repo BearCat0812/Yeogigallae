@@ -44,8 +44,7 @@ const About = () => {
                     <li className="address">{placeData.address}</li>
                     <li className="placeEx">
                         <pre>
-{`상세 설명이 필요한 경우 데이터베이스에서 가져오거나 
-별도로 관리해야 할 것 같습니다.`}
+{`상세설명[placeEx]`}
                         </pre>
                     </li>
                 </ul>
