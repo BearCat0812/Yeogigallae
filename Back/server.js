@@ -2,8 +2,8 @@ const mariadb = require('mariadb');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
-const expressSession = require('express-session');
-const cookieParser = require('cookie-parser');
+// const expressSession = require('express-session');
+// const cookieParser = require('cookie-parser');
 
 const app = express();
 const pool = mariadb.createPool({
@@ -100,12 +100,12 @@ const hashPassword = async (pw) => {
 // 미들웨어 설정
 app.use(express.json());
 app.use(cors());
-app.use(cookieParser());
-app.use(expressSession({
-    secret: 'KEY',
-    resave: false,
-    saveUninitialized: true
-}));
+// app.use(cookieParser());
+// app.use(expressSession({
+//     secret: 'KEY',
+//     resave: false,
+//     saveUninitialized: true
+// }));
 
 // 라우트 설정
 app.post('/regist', async (req, res) => {
@@ -143,6 +143,14 @@ app.post('/', async (req, res) => {
     const result = await print(req.body.region, req.body.dateType, req.body.places);
     res.json(result);
 });
+
+// app.post('/select', async (req, res) => {
+//     const { selectedRegion, dateType, selectedPlaces } = req.body;
+//     console.log(selectedPlaces);
+//     const result = await print(selectedRegion, dateType, selectedPlaces);
+
+//     return res.json(result);
+// })
 
 app.get('/all', async (req, res) => {
     const result = await executeQuery('SELECT region,placeName,address,dateType,place,imgName FROM database');
