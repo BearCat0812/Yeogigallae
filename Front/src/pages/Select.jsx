@@ -80,19 +80,6 @@ const Select = () => {
     sessionStorage.setItem('datePreferences', JSON.stringify(data));
     alert('설정이 저장되었습니다!');
 
-    // fetch("http://localhost:8080/", {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({ selectedRegion, dateType, selectedPlaces })
-    // })
-    //   .then(res => res.json())
-    //   .finally(() => {
-    //     window.location.reload();
-    //     navigate('/');
-    //   });
-
     navigate('/');
 
   };

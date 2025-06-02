@@ -144,14 +144,6 @@ app.post('/', async (req, res) => {
     res.json(result);
 });
 
-// app.post('/select', async (req, res) => {
-//     const { selectedRegion, dateType, selectedPlaces } = req.body;
-//     console.log(selectedPlaces);
-//     const result = await print(selectedRegion, dateType, selectedPlaces);
-
-//     return res.json(result);
-// })
-
 app.get('/all', async (req, res) => {
     const result = await executeQuery('SELECT region,placeName,address,dateType,place,imgName FROM database');
     res.json(result);
