@@ -54,13 +54,25 @@ const options = {
 };
 
 const Filter = () => {
-    const [region, setRegion] = useState('');
-    const [dateType, setDateType] = useState('');
-    const [places, setPlaces] = useState([]);
+    const savedPreferences = JSON.parse(sessionStorage.getItem('datePreferences') || '{}');
+    
+    const [region, setRegion] = useState(savedPreferences.region || '');
+    const [dateType, setDateType] = useState(savedPreferences.dateType || '');
+    const [places, setPlaces] = useState(savedPreferences.places || []);
     const [visible, setVisible] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
     const ref = useRef(null);
     const isLoggedIn = sessionStorage.getItem('name');
+
+    useEffect(() => {
+        if (dateType && savedPreferences.places) {
+            if (dateType === savedPreferences.dateType) {
+                setPlaces(savedPreferences.places);
+            } else {
+                setPlaces([]);
+            }
+        }
+    }, [dateType]);
 
     useEffect(() => {
         const handleClickOutside = e => {
@@ -82,7 +94,6 @@ const Filter = () => {
             return;
         }
 
-        // 최소한 하나의 필터 조건이라도 있는지 확인
         if (!region && !dateType && places.length === 0) {
             alert('최소한 하나의 조건을 선택해주세요.');
             return;
@@ -110,27 +121,13 @@ const Filter = () => {
             });
     };
 
-    const handleSearchFocus = (e) => {
-        if (!isLoggedIn) {
-            e.preventDefault();
-            e.target.blur(); // 포커스 해제
-            alert('로그인이 필요한 서비스입니다.');
-            return;
-        }
-        setVisible(true);
-    };
-
     const handleSearch = async (keyword) => {
         if (!keyword.trim()) return;
         
         try {
             const response = await fetch(`http://localhost:8080/search?keyword=${encodeURIComponent(keyword)}`);
             const data = await response.json();
-            
-            // 검색 결과로 받은 데이터를 sessionStorage에 임시 저장
             sessionStorage.setItem('searchResults', JSON.stringify(data));
-            
-            // 페이지 새로고침하여 CardLayout에서 검색 결과 표시
             window.location.reload();
         } catch (error) {
             console.error('검색 실패:', error);
@@ -150,6 +147,16 @@ const Filter = () => {
         if (searchKeyword.trim()) {
             handleSearch(searchKeyword);
         }
+    };
+
+    const handleSearchFocus = (e) => {
+        if (!isLoggedIn) {
+            e.preventDefault();
+            e.target.blur();
+            alert('로그인이 필요한 서비스입니다.');
+            return;
+        }
+        setVisible(true);
     };
 
     const renderRadioGroup = (name, items, value, onChange) =>
@@ -221,7 +228,6 @@ const Filter = () => {
                                 <div className="filter-group">
                                     {renderRadioGroup('dateType', options.dateType, dateType, id => {
                                         setDateType(id);
-                                        setPlaces([]);
                                     })}
                                 </div>
                             </div>
@@ -229,7 +235,9 @@ const Filter = () => {
                             {dateType && (
                                 <div className="filter-group-container">
                                     <h1 className="filter-name">장소 선택 (최대 2개)</h1>
-                                    <div className="filter-group group-place">{renderCheckboxGroup(options.places[dateType])}</div>
+                                    <div className="filter-group group-place">
+                                        {renderCheckboxGroup(options.places[dateType])}
+                                    </div>
                                 </div>
                             )}
 

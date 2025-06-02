@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './CardLayout.css';
 
-const CardLayout = () => {
+const CardLayout = ({ onCardClick }) => {
   const [cards, setCards] = useState([]);
   const [count, setCount] = useState(12);
   const loaderRef = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // 검색 결과가 있는지 확인
     const searchResults = sessionStorage.getItem('searchResults');
     if (searchResults) {
       setCards(JSON.parse(searchResults));
@@ -67,6 +67,20 @@ const CardLayout = () => {
     return () => el && observer.unobserve(el);
   }, [cards]);
 
+  const handleCardClick = (card) => {
+    if (onCardClick) {
+      onCardClick(card);
+    } else {
+      navigate('/about', { 
+        state: { 
+          placeName: card.placeName,
+          address: card.address,
+          imgName: card.imgName
+        } 
+      });
+    }
+  };
+
   return (
     <div className="container section-container">
       <p>당신의 하루를<br />설레게 할 장소를 소개할게요</p>
@@ -74,15 +88,18 @@ const CardLayout = () => {
         {cards.length === 0 ? (
           <p className="no-results">설렘을 줄 장소를 찾지 못했어요<br />다시 한 번 골라볼까요?</p>
         ) : (
-          cards.slice(0, count).map((p, i) => (
-            <div key={i}>
+          cards.slice(0, count).map((card, i) => (
+            <div key={i} onClick={() => handleCardClick(card)} style={{ cursor: 'pointer' }}>
               <div className="overlay">
-                <ul><li>{p.placeName}</li><li>{p.address}</li></ul>
+                <ul>
+                  <li>{card.placeName}</li>
+                  <li>{card.address}</li>
+                </ul>
                 <span><i className="fa-solid fa-location-arrow"></i></span>
               </div>
-              <Link to={p.link} className="card-section">
-                <img src={'/dbImages/' + p.imgName} alt={p.placeName} />
-              </Link>
+              <div className="card-section">
+                <img src={'/dbImages/' + card.imgName} alt={card.placeName} />
+              </div>
             </div>
           ))
         )}

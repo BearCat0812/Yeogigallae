@@ -14,8 +14,6 @@ const pool = mariadb.createPool({
     port: "3306"
 })
 
-// try-catch-finally 사용 권장
-
 async function registData(name, email, id, pw, tel) {
     let conn = await pool.getConnection();
     const rows = await conn.query('SELECT id, pw FROM users WHERE id = ?', [id]);
@@ -23,19 +21,13 @@ async function registData(name, email, id, pw, tel) {
     if (rows.length == 0 || rows[0].id !== id) {
         if (name !== "" && email !== "" && id !== "" && pw !== "" && tel !== "") {
             await conn.query("INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)", [name, email, id, pw, tel]);
-            console.log("회원가입 성공");
             conn.release();
-
             return true;
-
         } else {
-            console.log("회원가입 실패");
             return false;
         }
     } else {
-        console.log("이미 존재하는 아이디 입니다.");
         conn.release();
-
         return false;
     }
 }
@@ -46,18 +38,12 @@ async function login(id, pw) {
     const result = await bcrypt.compare(pw, rows[0].pw);
     if (rows.length > 0) {
         if (result == true) {
-            console.log("로그인 성공");
             conn.release();
-
             return true;
         } else {
-            console.log("비밀번호가 다릅니다");
-
             return false;
         }
     } else {
-        console.log("아이디를 확인해주세요");
-
         return false;
     }
 }
@@ -66,7 +52,6 @@ async function searchIdToName(id) {
     let conn = await pool.getConnection();
     const rows = await conn.query('SELECT name FROM users WHERE id = ?', [id]);
     conn.release();
-
     return rows[0].name;
 }
 
@@ -88,7 +73,6 @@ async function print(region, dateType, places) {
         let query = 'SELECT region,placeName,address,dateType,place,imgName FROM database WHERE 1=1';
         const params = [];
 
-        // 각 필터 조건이 있을 때만 WHERE 절에 추가
         if (region) {
             query += ' AND region = ?';
             params.push(region);
@@ -116,13 +100,6 @@ async function print(region, dateType, places) {
     }
 }
 
-const hashingPw = async (pw) => {
-    const saltRounds = 10;
-    const salt = await bcrypt.genSalt(saltRounds);
-    return await bcrypt.hash(pw, salt);
-}
-
-// 전체 데이터를 가져오는 함수 추가
 async function getAllData() {
     let conn = await pool.getConnection();
     const rows = await conn.query('SELECT region,placeName,address,dateType,place,imgName FROM database');
@@ -130,7 +107,6 @@ async function getAllData() {
     return rows;
 }
 
-// 검색 기능 추가
 async function searchData(keyword) {
     let conn = await pool.getConnection();
     try {
@@ -145,6 +121,12 @@ async function searchData(keyword) {
     } finally {
         conn.release();
     }
+}
+
+const hashingPw = async (pw) => {
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    return await bcrypt.hash(pw, salt);
 }
 
 app.use(express.json());
@@ -202,17 +184,14 @@ app.post('/login', async (req, res) => {
 app.post('/', async (req, res) => {
     const { region, dateType, places } = req.body;
     const result = await print(region, dateType, places);
-
     return res.json(result);
 })
 
-// 새로운 엔드포인트 추가
 app.get('/all', async (req, res) => {
     const result = await getAllData();
     return res.json(result);
 });
 
-// 검색 엔드포인트 추가
 app.get('/search', async (req, res) => {
     const { keyword } = req.query;
     if (!keyword) {
