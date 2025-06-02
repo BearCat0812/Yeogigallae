@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import './About.css'
-import CardLayout from '../components/CardLayout.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
+import CardLayout from '../components/CardLayout.jsx';
+import Review from '../components/Review.jsx';
 
 const About = () => {
   const location = useLocation();
@@ -50,6 +51,7 @@ const About = () => {
                 </ul>
             </div>
         </div>
+        <Review />
         <CardLayout onCardClick={handleCardClick} />
     </div>
   )
