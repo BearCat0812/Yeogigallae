@@ -1,134 +1,103 @@
 const mariadb = require('mariadb');
 const express = require('express');
-const app = express();
-const cors = require('cors');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 const expressSession = require('express-session');
 const cookieParser = require('cookie-parser');
 
+const app = express();
 const pool = mariadb.createPool({
     host: "192.168.0.191",
     user: "1team",
     password: "1team",
     database: "1team",
     port: "3306"
-})
+});
 
-async function registData(name, email, id, pw, tel) {
-    let conn = await pool.getConnection();
-    const rows = await conn.query('SELECT id, pw FROM users WHERE id = ?', [id]);
-
-    if (rows.length == 0 || rows[0].id !== id) {
-        if (name !== "" && email !== "" && id !== "" && pw !== "" && tel !== "") {
-            await conn.query("INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)", [name, email, id, pw, tel]);
-            conn.release();
-            return true;
-        } else {
-            return false;
-        }
-    } else {
+// DB 쿼리 실행 헬퍼 함수
+const executeQuery = async (query, params = []) => {
+    const conn = await pool.getConnection();
+    try {
+        return await conn.query(query, params);
+    } finally {
         conn.release();
-        return false;
     }
-}
+};
 
-async function login(id, pw) {
-    let conn = await pool.getConnection();
-    const rows = await conn.query('SELECT id, pw FROM users WHERE id = ?', [id]);
-    const result = await bcrypt.compare(pw, rows[0].pw);
-    if (rows.length > 0) {
-        if (result == true) {
-            conn.release();
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
-}
-
-async function searchIdToName(id) {
-    let conn = await pool.getConnection();
-    const rows = await conn.query('SELECT name FROM users WHERE id = ?', [id]);
-    conn.release();
-    return rows[0].name;
-}
-
-async function compareData(id) {
-    let conn = await pool.getConnection();
-    const rows = await conn.query('SELECT id FROM users WHERE id = ?', [id]);
-    conn.release();
-
-    if (rows[0] === undefined) {
-        return false;
-    } else {
-        return rows[0].id
-    }
-}
-
+// 필터링된 데이터 조회
 async function print(region, dateType, places) {
-    let conn = await pool.getConnection();
-    try {
-        let query = 'SELECT region,placeName,address,dateType,place,imgName FROM database WHERE 1=1';
-        const params = [];
-
-        if (region) {
-            query += ' AND region = ?';
-            params.push(region);
-        }
-        
-        if (dateType) {
-            query += ' AND dateType = ?';
-            params.push(dateType);
-        }
-        
-        if (places && places.length > 0) {
-            if (places.length === 1) {
-                query += ' AND place = ?';
-                params.push(places[0]);
-            } else if (places.length === 2) {
-                query += ' AND (place = ? OR place = ?)';
-                params.push(places[0], places[1]);
-            }
-        }
-
-        const rows = await conn.query(query, params);
-        return rows;
-    } finally {
-        conn.release();
+    if (!region && !dateType && (!places || places.length === 0)) {
+        return await executeQuery('SELECT region,placeName,address,dateType,place,imgName FROM database');
     }
+
+    const conditions = [];
+    const params = [];
+
+    if (region) {
+        conditions.push('region = ?');
+        params.push(region);
+    }
+    if (dateType) {
+        conditions.push('dateType = ?');
+        params.push(dateType);
+    }
+    if (places?.length) {
+        const placeCondition = places.length === 1 
+            ? 'place = ?' 
+            : '(place = ? OR place = ?)';
+        conditions.push(placeCondition);
+        params.push(...places);
+    }
+
+    const query = `
+        SELECT region,placeName,address,dateType,place,imgName 
+        FROM database 
+        ${conditions.length ? 'WHERE ' + conditions.join(' AND ') : ''}
+    `;
+
+    return await executeQuery(query, params);
 }
 
-async function getAllData() {
-    let conn = await pool.getConnection();
-    const rows = await conn.query('SELECT region,placeName,address,dateType,place,imgName FROM database');
-    conn.release();
-    return rows;
+// 회원가입 처리
+async function registData(name, email, id, pw, tel) {
+    if (!name || !email || !id || !pw || !tel) return false;
+
+    const existingUser = await executeQuery('SELECT id FROM users WHERE id = ?', [id]);
+    if (existingUser.length > 0) return false;
+
+    await executeQuery(
+        "INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)",
+        [name, email, id, pw, tel]
+    );
+    return true;
 }
 
+// 로그인 처리
+async function login(id, pw) {
+    const users = await executeQuery('SELECT id, pw FROM users WHERE id = ?', [id]);
+    if (!users.length) return false;
+    
+    return await bcrypt.compare(pw, users[0].pw);
+}
+
+// 검색 처리
 async function searchData(keyword) {
-    let conn = await pool.getConnection();
-    try {
-        const query = `
-            SELECT region, placeName, address, dateType, place, imgName 
-            FROM database 
-            WHERE placeName LIKE ? OR address LIKE ? OR place LIKE ?
-        `;
-        const searchKeyword = `%${keyword}%`;
-        const rows = await conn.query(query, [searchKeyword, searchKeyword, searchKeyword]);
-        return rows;
-    } finally {
-        conn.release();
-    }
+    const searchPattern = `%${keyword}%`;
+    return await executeQuery(
+        `SELECT region,placeName,address,dateType,place,imgName 
+         FROM database 
+         WHERE placeName LIKE ? OR address LIKE ? OR place LIKE ?`,
+        [searchPattern, searchPattern, searchPattern]
+    );
 }
 
-const hashingPw = async (pw) => {
-    const saltRounds = 10;
-    const salt = await bcrypt.genSalt(saltRounds);
+// 비밀번호 해싱
+const hashPassword = async (pw) => {
+    const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(pw, salt);
-}
+};
 
+// 미들웨어 설정
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
@@ -138,69 +107,51 @@ app.use(expressSession({
     saveUninitialized: true
 }));
 
+// 라우트 설정
 app.post('/regist', async (req, res) => {
-    const { stat } = req.body;
-    if (stat == "idCompare") {
-        const { id } = req.body;
-        const comp = await compareData(id);
+    const { stat, id, name, email, pw, tel, ok } = req.body;
 
-        if (comp != false) {
-            return res.json({ success: false, duplicateCheck: 1 });
-        } else {
-            if (id.length <= 6) {
-                return res.json({ success: false, duplicateCheck: 0 });
-            } else {
-                return res.json({ success: true, duplicateCheck: 0 });
-            }
-        }
-
-    } else if (stat == "register") {
-        const { name, email, id, pw, tel, ok } = req.body;
-        if (ok == 0) {
-            const reg = await registData(name, email, id, await hashingPw(pw), tel);
-
-            if (reg == true) {
-                return res.json({ success: true, id: id });
-            } else {
-                return res.json({ success: false });
-            }
-        } else {
-            return res.json({ success: false });
-        }
+    if (stat === "idCompare") {
+        const exists = await executeQuery('SELECT id FROM users WHERE id = ?', [id]);
+        return res.json({
+            success: !exists.length && id.length > 6,
+            duplicateCheck: exists.length ? 1 : 0
+        });
     }
-})
+
+    if (stat === "register" && ok === 0) {
+        const success = await registData(name, email, id, await hashPassword(pw), tel);
+        return res.json({ success, id: success ? id : null });
+    }
+
+    res.json({ success: false });
+});
 
 app.post('/login', async (req, res) => {
     const { id, pw } = req.body;
-    const check = await login(id, pw);
-    const name = await searchIdToName(id);
-    if (check == true) {
-        return res.status(200).json({ success: true, id: id, name: name });
-    } else {
+    const isValid = await login(id, pw);
+
+    if (!isValid) {
         return res.status(401).json({ success: false });
     }
-})
+
+    const user = await executeQuery('SELECT name FROM users WHERE id = ?', [id]);
+    res.status(200).json({ success: true, id, name: user[0].name });
+});
 
 app.post('/', async (req, res) => {
-    const { region, dateType, places } = req.body;
-    const result = await print(region, dateType, places);
-    return res.json(result);
-})
+    const result = await print(req.body.region, req.body.dateType, req.body.places);
+    res.json(result);
+});
 
 app.get('/all', async (req, res) => {
-    const result = await getAllData();
-    return res.json(result);
+    const result = await executeQuery('SELECT region,placeName,address,dateType,place,imgName FROM database');
+    res.json(result);
 });
 
 app.get('/search', async (req, res) => {
-    const { keyword } = req.query;
-    if (!keyword) {
-        return res.json([]);
-    }
-    const result = await searchData(keyword);
-    return res.json(result);
+    const result = req.query.keyword ? await searchData(req.query.keyword) : [];
+    res.json(result);
 });
 
-app.listen(8080, () => {
-    console.log('서버 실행 중...');
-});
+app.listen(8080, () => console.log('서버 실행 중...'));

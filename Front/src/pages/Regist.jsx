@@ -110,10 +110,10 @@ const Regist = () => {
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          alert("Regist Response Success");
+          alert("회원가입이 정상적으로 완료되었습니다.");
           navigate('/login');
         } else {
-          alert("다시 확인해 주세요");
+          alert("회원가입에 실패했습니다. 다시 시도해주세요.");
         }
       });
   }

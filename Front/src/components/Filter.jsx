@@ -202,6 +202,7 @@ const Filter = () => {
                         placeholder={isLoggedIn ? "지금 딱, 가고 싶은 데이트 장소는?" : "회원 전용 기능입니다"}
                         onFocus={handleSearchFocus}
                         className={!isLoggedIn ? "disabled" : ""}
+                        autoComplete="off"
                     />
                 </form>
             </div>

@@ -8,55 +8,54 @@ const CardLayout = ({ onCardClick }) => {
   const loaderRef = useRef();
   const navigate = useNavigate();
 
+  // 데이터 페치 로직
+  const fetchData = async (url, options = {}) => {
+    try {
+      const response = await fetch(url, options);
+      return await response.json();
+    } catch (err) {
+      console.error('데이터 불러오기 실패:', err);
+      return [];
+    }
+  };
+
   useEffect(() => {
-    const searchResults = sessionStorage.getItem('searchResults');
-    if (searchResults) {
-      setCards(JSON.parse(searchResults));
-      sessionStorage.removeItem('searchResults');
-      return;
-    }
+    const loadData = async () => {
+      // 검색 결과 처리
+      const searchResults = sessionStorage.getItem('searchResults');
+      if (searchResults) {
+        setCards(JSON.parse(searchResults));
+        sessionStorage.removeItem('searchResults');
+        return;
+      }
 
-    const preferences = sessionStorage.getItem('datePreferences');
-    const isLoggedIn = sessionStorage.getItem('name');
+      const isLoggedIn = sessionStorage.getItem('name');
+      const preferences = sessionStorage.getItem('datePreferences');
 
-    if (!isLoggedIn) {
-      fetch('http://localhost:8080/all')
-        .then(res => res.json())
-        .then(data => {
-          setCards(data);
-        })
-        .catch(err => {
-          console.error('데이터 불러오기 실패:', err);
-        });
-      return;
-    }
+      // 로그인/필터링 상태에 따른 데이터 로드
+      if (!isLoggedIn) {
+        const data = await fetchData('http://localhost:8080/all');
+        setCards(data);
+        return;
+      }
 
-    if (preferences) {
-      const filterData = JSON.parse(preferences);
-      fetch('http://localhost:8080/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filterData)
-      })
-        .then(res => res.json())
-        .then(data => {
-          setCards(data);
-        })
-        .catch(err => {
-          console.error('데이터 불러오기 실패:', err);
+      if (preferences) {
+        const data = await fetchData('http://localhost:8080/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(JSON.parse(preferences))
         });
-    } else {
-      fetch('http://localhost:8080/all')
-        .then(res => res.json())
-        .then(data => {
-          setCards(data);
-        })
-        .catch(err => {
-          console.error('데이터 불러오기 실패:', err);
-        });
-    }
+        setCards(data);
+      } else {
+        const data = await fetchData('http://localhost:8080/all');
+        setCards(data);
+      }
+    };
+
+    loadData();
   }, []);
 
+  // 무한 스크롤 처리
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => entry.isIntersecting && setCount(c => Math.min(c + 6, cards.length)),
@@ -67,19 +66,37 @@ const CardLayout = ({ onCardClick }) => {
     return () => el && observer.unobserve(el);
   }, [cards]);
 
+  // 카드 클릭 핸들러
   const handleCardClick = (card) => {
     if (onCardClick) {
       onCardClick(card);
-    } else {
-      navigate('/about', { 
-        state: { 
-          placeName: card.placeName,
-          address: card.address,
-          imgName: card.imgName
-        } 
-      });
+      return;
     }
+    
+    navigate('/about', { 
+      state: { 
+        placeName: card.placeName,
+        address: card.address,
+        imgName: card.imgName
+      } 
+    });
   };
+
+  // 카드 렌더링
+  const renderCard = (card, index) => (
+    <div key={index} onClick={() => handleCardClick(card)} style={{ cursor: 'pointer' }}>
+      <div className="overlay">
+        <ul>
+          <li>{card.placeName}</li>
+          <li>{card.address}</li>
+        </ul>
+        <span><i className="fa-solid fa-location-arrow"></i></span>
+      </div>
+      <div className="card-section">
+        <img src={'/dbImages/' + card.imgName} alt={card.placeName} />
+      </div>
+    </div>
+  );
 
   return (
     <div className="container section-container">
@@ -88,20 +105,7 @@ const CardLayout = ({ onCardClick }) => {
         {cards.length === 0 ? (
           <p className="no-results">설렘을 줄 장소를 찾지 못했어요<br />다시 한 번 골라볼까요?</p>
         ) : (
-          cards.slice(0, count).map((card, i) => (
-            <div key={i} onClick={() => handleCardClick(card)} style={{ cursor: 'pointer' }}>
-              <div className="overlay">
-                <ul>
-                  <li>{card.placeName}</li>
-                  <li>{card.address}</li>
-                </ul>
-                <span><i className="fa-solid fa-location-arrow"></i></span>
-              </div>
-              <div className="card-section">
-                <img src={'/dbImages/' + card.imgName} alt={card.placeName} />
-              </div>
-            </div>
-          ))
+          cards.slice(0, count).map(renderCard)
         )}
         {count < cards.length && <div ref={loaderRef} style={{ height: 50 }} />}
       </div>
