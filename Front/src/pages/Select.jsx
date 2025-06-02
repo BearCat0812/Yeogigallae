@@ -71,6 +71,7 @@ const Select = () => {
       alert('선호하는 장소를 최소 1곳 선택해주세요.');
       return;
     }
+
     const data = {
       region: selectedRegion,
       dateType,
@@ -79,11 +80,25 @@ const Select = () => {
     sessionStorage.setItem('datePreferences', JSON.stringify(data));
     alert('설정이 저장되었습니다!');
 
+    // fetch("http://localhost:8080/", {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({ selectedRegion, dateType, selectedPlaces })
+    // })
+    //   .then(res => res.json())
+    //   .finally(() => {
+    //     window.location.reload();
+    //     navigate('/');
+    //   });
+
     navigate('/');
+
   };
 
   const hasSelectedPlaces = (dateType === 'inside' && indoorPlaces.length > 0) ||
-                            (dateType === 'outside' && outdoorPlaces.length > 0);
+    (dateType === 'outside' && outdoorPlaces.length > 0);
 
   return (
     <div className="select-container container">
