@@ -162,6 +162,14 @@ app.post('/', async (req, res) => {
     return res.json(result);
 })
 
+// app.post('/select', async (req, res) => {
+//     const { selectedRegion, dateType, selectedPlaces } = req.body;
+//     console.log(selectedPlaces);
+//     const result = await print(selectedRegion, dateType, selectedPlaces);
+
+//     return res.json(result);
+// })
+
 app.listen(8080, () => {
     console.log('서버 실행 중...');
 });
