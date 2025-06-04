@@ -29,16 +29,16 @@ const Review = () => {
   const comment = (e) => {
     e.preventDefault();
 
-    const name = sessionStorage.getItem('name');
     const date = new Date();
     const now = date.toLocaleString();
     console.log(now);
     fetch("http://localhost:8080/about", {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, now, title, detail }),
+      body: JSON.stringify({ title, detail, now }),
     })
       .then(res => res.json())
     // .then(res => {

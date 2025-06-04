@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import './Select.css';
+import { useEffect } from 'react';
 
 const indoorOptions = [
   { id: 'gourmet', label: '맛집' },
@@ -34,7 +35,35 @@ const Select = () => {
   const [dateType, setDateType] = useState('');
   const [indoorPlaces, setIndoorPlaces] = useState([]);
   const [outdoorPlaces, setOutdoorPlaces] = useState([]);
+  const [name, setName] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch('http://localhost:8080/select', {
+      method: 'POST',
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(res => {
+        setName(res.name); // ✅ 이렇게 써야 정상 작동
+      });
+  }, []); // 컴포넌트가 처음 렌더링될 때 한 번 실행
+
+  // useEffect(() => {
+  //   fetch('http://localhost:8080/session-check', {
+  //     method: 'GET',
+  //     credentials: 'include',
+  //   })
+  //     .then(res => res.json())
+  //     .then(res => {
+  //       if (res.loggedIn) {
+  //         setName(res.name);
+  //       } else {
+  //         alert("로그인 상태가 아닙니다. 다시 로그인해주세요.");
+  //         navigate('/login');
+  //       }
+  //     });
+  // }, []);
 
   const handleRegionClick = (id) => {
     setSelectedRegion((prev) => (prev === id ? '' : id));
@@ -89,7 +118,7 @@ const Select = () => {
 
   return (
     <div className="select-container container">
-      <p className="select-hello">{sessionStorage.getItem('name')}님, 안녕하세요!</p>
+      <p className="select-hello">{name}님, 안녕하세요!</p>
       <p className="selectbar-container-label">설레는 하루, 어디서 만날까요?</p>
       <div className="selectbar-container">
         {[

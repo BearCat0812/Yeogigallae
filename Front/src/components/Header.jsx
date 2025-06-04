@@ -6,16 +6,20 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    sessionStorage.removeItem("name");
-    setIsLoggedIn(false);
-    alert("로그아웃 되었습니다.");
-    navigate('/');
-    window.location.reload();
+    fetch('http://localhost:8080/logout', {
+      method: 'POST',
+      credentials: 'include',
+    }).then(() => {
+      setIsLoggedIn(false);
+      alert("로그아웃 되었습니다.");
+      navigate('/');
+      window.location.reload();
+    });
   };
 
   return (
     <div className="header-container">
-      <img src="/images/logoS.png" alt="logo" onClick={() => navigate('/')} className="logo"/>
+      <img src="/images/logoS.png" alt="logo" onClick={() => navigate('/')} className="logo" />
       {!isLoggedIn ? (
         <button className="login-btn" onClick={() => navigate('/login')}>로그인/회원가입</button>
       ) : (

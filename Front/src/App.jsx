@@ -16,11 +16,18 @@ function App() {
 
   // 페이지 새로고침 후에도 로그인 상태 유지
   useEffect(() => {
-    const storedName = sessionStorage.getItem('name');
-    if (storedName) {
-      setIsLoggedIn(true);
-    }
+    fetch('http://localhost:8080/session-check', {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (res.loggedIn) {
+          setIsLoggedIn(true);
+        }
+      });
   }, []);
+
 
   return (
     <div>

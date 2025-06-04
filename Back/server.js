@@ -2,9 +2,7 @@ const mariadb = require('mariadb');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
-// const expressSession = require('express-session');
-// const cookieParser = require('cookie-parser');
-
+const expressSession = require('express-session');
 const app = express();
 const pool = mariadb.createPool({
     host: "192.168.0.191",
@@ -91,11 +89,12 @@ async function searchData(keyword) {
     );
 }
 
-async function comment(name, title, detail, now) {
+async function comment(num, name, title, detail, now) {
+    if (num != undefined && name != null) {
+        const db = await executeQuery("INSERT INTO comment(num,name,title,detail,date) VALUES (?,?,?,?,?)", [num, name, title, detail, now]);
 
-    const db = await executeQuery("INSERT INTO comment(name,title,detail,date) VALUES (?,?,?,?)", [name, title, detail, now]);
-
-    return db.affectedRows > 0;
+        return db.affectedRows > 0;
+    }
 }
 
 // 비밀번호 해싱
@@ -105,14 +104,22 @@ const hashPassword = async (pw) => {
 };
 
 // 미들웨어 설정
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+
 app.use(express.json());
-app.use(cors());
-// app.use(cookieParser());
-// app.use(expressSession({
-//     secret: 'KEY',
-//     resave: false,
-//     saveUninitialized: true
-// }));
+
+app.use(expressSession({
+    secret: 'KEY',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 20, // 20분
+    }
+}));
 
 // 라우트 설정
 app.post('/regist', async (req, res) => {
@@ -142,16 +149,21 @@ app.post('/login', async (req, res) => {
         return res.status(401).json({ success: false });
     }
 
-    const user = await executeQuery('SELECT name FROM users WHERE id = ?', [id]);
-    res.status(200).json({ success: true, id, name: user[0].name });
+    const user = await executeQuery('SELECT name,num FROM users WHERE id = ?', [id]);
+
+    req.session.userNum = user[0].num;
+    req.session.userId = id;
+    req.session.userName = user[0].name;
+
+    res.status(200).json({ success: true, id, name: req.session.userName });
 });
 
 app.post('/about', async (req, res) => {
-    const { name, title, detail, now } = req.body;
-    const setDB = await comment(name, title, detail, now);
+    const { title, detail, now } = req.body;
+    const setDB = await comment(req.session.userNum, req.session.userName, title, detail, now);
 
     if (setDB) {
-        return res.json({ name, title, detail, now });
+        return res.json({ title, detail, now });
     }
 });
 
@@ -159,6 +171,21 @@ app.post('/', async (req, res) => {
     const result = await print(req.body.region, req.body.dateType, req.body.places);
     res.json(result);
 });
+
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ success: false });
+        }
+        res.clearCookie('connect.sid'); // 기본 세션 쿠키 이름
+        res.json({ success: true });
+    });
+});
+
+app.post('/select', (req, res) => {
+
+    return res.json({ name: req.session.userName })
+})
 
 app.get('/all', async (req, res) => {
     const result = await executeQuery('SELECT region,placeName,address,dateType,place,imgName FROM database');
@@ -168,6 +195,14 @@ app.get('/all', async (req, res) => {
 app.get('/search', async (req, res) => {
     const result = req.query.keyword ? await searchData(req.query.keyword) : [];
     res.json(result);
+});
+
+app.get('/session-check', (req, res) => {
+    if (req.session.userId) {
+        res.json({ loggedIn: true, id: req.session.userId, name: req.session.userName });
+    } else {
+        res.json({ loggedIn: false });
+    }
 });
 
 app.listen(8080, () => console.log('서버 실행 중...'));

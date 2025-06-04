@@ -38,17 +38,17 @@ const Login = ({ setIsLoggedIn }) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ id, pw }),
     })
       .then(res => res.json())
       .then(res => {
         if (res.success === true) {
-          sessionStorage.setItem("name", res.name);
           setIsLoggedIn(true);
           alert(`${res.name}님, 환영합니다!`);
           navigate('/select');
         } else {
-          alert("정확한 아이디/패스워드를 입력해주세요.");
+          alert("정확한 아이디 / 패스워드를 입력해주세요.");
         }
       });
   };
