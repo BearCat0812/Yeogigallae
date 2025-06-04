@@ -31,7 +31,7 @@ const Review = () => {
 
     const date = new Date();
     const now = date.toLocaleString();
-    console.log(now);
+
     fetch("http://localhost:8080/about", {
       method: 'POST',
       credentials: 'include',
