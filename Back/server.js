@@ -42,8 +42,8 @@ async function print(region, dateType, places) {
         params.push(dateType);
     }
     if (places?.length) {
-        const placeCondition = places.length === 1 
-            ? 'place = ?' 
+        const placeCondition = places.length === 1
+            ? 'place = ?'
             : '(place = ? OR place = ?)';
         conditions.push(placeCondition);
         params.push(...places);
@@ -76,7 +76,7 @@ async function registData(name, email, id, pw, tel) {
 async function login(id, pw) {
     const users = await executeQuery('SELECT id, pw FROM users WHERE id = ?', [id]);
     if (!users.length) return false;
-    
+
     return await bcrypt.compare(pw, users[0].pw);
 }
 
@@ -89,6 +89,13 @@ async function searchData(keyword) {
          WHERE placeName LIKE ? OR address LIKE ? OR place LIKE ?`,
         [searchPattern, searchPattern, searchPattern]
     );
+}
+
+async function comment(name, title, detail, now) {
+
+    const db = await executeQuery("INSERT INTO comment(name,title,detail,date) VALUES (?,?,?,?)", [name, title, detail, now]);
+
+    return db.affectedRows > 0;
 }
 
 // 비밀번호 해싱
@@ -137,6 +144,15 @@ app.post('/login', async (req, res) => {
 
     const user = await executeQuery('SELECT name FROM users WHERE id = ?', [id]);
     res.status(200).json({ success: true, id, name: user[0].name });
+});
+
+app.post('/about', async (req, res) => {
+    const { name, title, detail, now } = req.body;
+    const setDB = await comment(name, title, detail, now);
+
+    if (setDB) {
+        return res.json({ name, title, detail, now });
+    }
 });
 
 app.post('/', async (req, res) => {
