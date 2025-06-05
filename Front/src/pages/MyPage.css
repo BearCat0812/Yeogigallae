@@ -1,19 +1,109 @@
-.regist-container {
-    min-height: 1200px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.userinfo-container {
+  min-height: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-form.regist-form {
-    margin: 0 auto;
-    width: 500px;
-    padding: 50px;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+.userinfo-form {
+  margin: 0 auto;
+  width: 500px;
+  padding: 50px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+}
+
+.userinfo-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 50px;
+}
+
+.userinfo-content img {
+  width: 40%;
+}
+
+.userinfo-form > p {
+  width: 100%;
+  height: 50px;
+  font-family: 'Bold', sans-serif;
+  font-size: 30px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+.userinfo-form > h1 {
+  width: 100%;
+  height: 30px;
+  font-size: 15px;
+  font-weight: normal;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.userinfo-form-group {
+  width: 100%;
+  position: relative;
+  padding-bottom: 35px;
+}
+
+.userinfo-form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.userinfo-form-group .info-value {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background-color: #f8f8f8;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.edit-btn {
+  width: 100%;
+  height: 50px;
+  background-color: #222;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.edit-btn:hover {
+  background-color: #444;
+}
+
+/* 회원정보 수정 페이지 스타일 */
+.regist-container {
+  min-height: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.regist-form {
+  margin: 0 auto;
+  width: 500px;
+  padding: 50px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
 }
 
 .regist-content {
@@ -29,124 +119,124 @@ form.regist-form {
 }
 
 .regist-form-group {
-    width: 100%;
-    position: relative;
-    padding-bottom: 35px;
+  width: 100%;
+  position: relative;
+  padding-bottom: 35px;
 }
 
 .error-msg {
-    position: absolute;
-    margin-top: 10px;
-    margin-left: 5px;
-    font-size: 13px;
-    line-height: 1;
+  position: absolute;
+  margin-top: 10px;
+  margin-left: 5px;
+  font-size: 13px;
+  line-height: 1;
 }
 
-form.regist-form > p {
-    width: 100%;
-    height: 50px;
-    font-family: 'Bold', sans-serif;
-    font-size: 30px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
+.regist-form > p {
+  width: 100%;
+  height: 50px;
+  font-family: 'Bold', sans-serif;
+  font-size: 30px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
 }
 
-form.regist-form > h1 {
-    width: 100%;
-    height: 30px;
-    font-size: 15px;
-    font-weight: normal;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    margin-bottom: 30px;
+.regist-form > h1 {
+  width: 100%;
+  height: 30px;
+  font-size: 15px;
+  font-weight: normal;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .regist-form-group > input {
-    margin-top: 5px;
-    padding-left: 15px;
-    padding-right: 15px;
-    width: 100%;
-    height: 50px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+  margin-top: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 100%;
+  height: 50px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
 }
 
 #info__pw,
 #info__pwRe {
-    position: relative;
+  position: relative;
 }
 
 #info__pw i,
 #info__pwRe i {
-    font-size: 20px;
-    position: absolute;
-    bottom: 60px;
-    right: 10px;
-    cursor: pointer;
+  font-size: 20px;
+  position: absolute;
+  bottom: 60px;
+  right: 10px;
+  cursor: pointer;
 }
 
 .email-input-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
 }
 
 .email-input-group input {
-    height: 50px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    padding: 0 15px;
+  height: 50px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 0 15px;
 }
 
 .email-input-group input:first-child {
-    width: 35%;
+  width: 35%;
 }
 
 .email-input-group span {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 .email-input-group input:nth-child(3) {
-    width: 35%;
+  width: 35%;
 }
 
 .email-input-group select {
-    width: 25%;
-    height: 50px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    padding: 0 10px;
+  width: 25%;
+  height: 50px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 0 10px;
 }
 
 .submit-btn {
-    width: 100%;
-    height: 50px;
-    background-color: #222;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 20px;
+  width: 100%;
+  height: 50px;
+  background-color: #222;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
 }
 
 .submit-btn:hover {
-    background-color: #444;
+  background-color: #444;
 }
 
 * {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 input, textarea, select {
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
-    user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }

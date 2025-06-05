@@ -269,10 +269,11 @@ app.post('/select', (req, res) => {
 app.post('/user-info', async (req, res) => {
     const { id } = req.body;
     try {
-        const user = await executeQuery('SELECT name, email, tel FROM users WHERE id = ?', [id]);
+        const user = await executeQuery('SELECT id, name, email, tel FROM users WHERE id = ?', [id]);
         if (user.length > 0) {
             res.json({
                 success: true,
+                id: user[0].id,
                 name: user[0].name,
                 email: user[0].email,
                 tel: user[0].tel
