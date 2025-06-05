@@ -25,7 +25,7 @@ const executeQuery = async (query, params = []) => {
 // 필터링된 데이터 조회
 async function print(region, dateType, places) {
     if (!region && !dateType && (!places || places.length === 0)) {
-        return await executeQuery('SELECT id,region,placeName,address,dateType,place,imgName FROM database');
+        return await executeQuery('SELECT id,region,placeName,address,dateType,place,imgName FROM `database`');
     }
 
     const conditions = [];
@@ -49,7 +49,7 @@ async function print(region, dateType, places) {
 
     const query = `
         SELECT id,region,placeName,address,dateType,place,imgName 
-        FROM database 
+        FROM \`database\` 
         ${conditions.length ? 'WHERE ' + conditions.join(' AND ') : ''}
     `;
 
@@ -70,8 +70,15 @@ const validateEmail = (email) => {
 
 // 비밀번호 유효성 검사 함수
 const validatePassword = (pw) => {
-    const pwRegex = /^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
-    return pwRegex.test(pw);
+    // 각 조건을 개별적으로 검사
+    const hasLength = pw.length >= 8 && pw.length <= 20;
+    const hasLetter = /[A-Za-z]/.test(pw);
+    const hasNumber = /[0-9]/.test(pw);
+    const hasSpecial = /[!@#$%^&*]/.test(pw);
+    const hasValidChars = /^[A-Za-z0-9!@#$%^&*]+$/.test(pw);
+
+    // 모든 조건을 만족하는지 확인
+    return hasLength && hasLetter && hasNumber && hasSpecial && hasValidChars;
 };
 
 // 아이디 유효성 검사 함수
@@ -80,51 +87,70 @@ const validateId = (id) => {
     return idRegex.test(id);
 };
 
+// 비밀번호 해싱 함수
+const hashPassword = async (pw) => {
+    try {
+        const salt = await bcrypt.genSalt(10);
+        return await bcrypt.hash(pw, salt);
+    } catch (error) {
+        console.error('비밀번호 해싱 오류:', error);
+        throw error;
+    }
+};
+
 // 회원가입 처리
 async function registData(name, email, id, pw, tel) {
-    // 필수 필드 검사
-    if (!name || !email || !id || !pw || !tel) {
-        return { success: false, message: "모든 필드를 입력해주세요." };
-    }
+    try {
+        // 필수 필드 검사
+        if (!name || !email || !id || !pw || !tel) {
+            return { success: false, message: "모든 필드를 입력해주세요." };
+        }
 
-    // 이메일 유효성 검사
-    if (!validateEmail(email)) {
-        return { success: false, message: "올바른 이메일 형식이 아닙니다." };
-    }
+        // 이메일 유효성 검사
+        if (!validateEmail(email)) {
+            return { success: false, message: "올바른 이메일 형식이 아닙니다." };
+        }
 
-    // 아이디 유효성 검사
-    if (!validateId(id)) {
-        return { success: false, message: "아이디는 6~20자의 영문 소문자와 숫자만 사용 가능합니다." };
-    }
+        // 아이디 유효성 검사
+        if (!validateId(id)) {
+            return { success: false, message: "아이디는 6~20자의 영문 소문자와 숫자만 사용 가능합니다." };
+        }
 
-    // 비밀번호 유효성 검사
-    if (!validatePassword(pw)) {
-        return { success: false, message: "비밀번호는 8~20자의 영문, 숫자, 특수문자를 모두 포함해야 합니다." };
-    }
+        // 비밀번호 유효성 검사
+        if (!validatePassword(pw)) {
+            return { success: false, message: "비밀번호는 8~20자의 영문, 숫자, 특수문자를 모두 포함해야 합니다." };
+        }
 
-    // 전화번호 유효성 검사
-    if (!validatePhoneNumber(tel)) {
-        return { success: false, message: "올바른 전화번호 형식이 아닙니다." };
-    }
+        // 전화번호 유효성 검사
+        if (!validatePhoneNumber(tel)) {
+            return { success: false, message: "올바른 전화번호 형식이 아닙니다." };
+        }
 
-    // 아이디 중복 검사
-    const existingUser = await executeQuery('SELECT id FROM users WHERE id = ?', [id]);
-    if (existingUser.length > 0) {
-        return { success: false, message: "이미 존재하는 아이디입니다." };
-    }
+        // 아이디 중복 검사
+        const existingUser = await executeQuery('SELECT id FROM users WHERE id = ?', [id]);
+        if (existingUser.length > 0) {
+            return { success: false, message: "이미 존재하는 아이디입니다." };
+        }
 
-    // 이메일 중복 검사
-    const existingEmail = await executeQuery('SELECT email FROM users WHERE email = ?', [email]);
-    if (existingEmail.length > 0) {
-        return { success: false, message: "이미 사용 중인 이메일입니다." };
-    }
+        // 이메일 중복 검사
+        const existingEmail = await executeQuery('SELECT email FROM users WHERE email = ?', [email]);
+        if (existingEmail.length > 0) {
+            return { success: false, message: "이미 사용 중인 이메일입니다." };
+        }
 
-    // 회원가입 처리
-    await executeQuery(
-        "INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)",
-        [name, email, id, pw, tel]
-    );
-    return { success: true };
+        // 비밀번호 해싱
+        const hashedPassword = await hashPassword(pw);
+
+        // 회원가입 처리
+        await executeQuery(
+            "INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)",
+            [name, email, id, hashedPassword, tel]
+        );
+        return { success: true };
+    } catch (error) {
+        console.error('회원가입 오류:', error);
+        return { success: false, message: "서버 오류가 발생했습니다." };
+    }
 }
 
 // 로그인 처리
@@ -140,7 +166,7 @@ async function searchData(keyword) {
     const searchPattern = `%${keyword}%`;
     return await executeQuery(
         `SELECT id,region,placeName,address,dateType,place,imgName 
-         FROM database 
+         FROM \`database\` 
          WHERE placeName LIKE ? OR address LIKE ? OR place LIKE ?`,
         [searchPattern, searchPattern, searchPattern]
     );
@@ -177,7 +203,6 @@ function parseKoreanDate(dateStr) {
 // 리뷰 조회 함수
 async function getReviews(placeId) {
     try {
-        console.log('Fetching reviews for placeId:', placeId);
         const reviews = await executeQuery(
             `SELECT c.title, c.detail, c.date, c.name as userName 
              FROM comment c 
@@ -185,18 +210,15 @@ async function getReviews(placeId) {
              ORDER BY c.date DESC`,
             [placeId]
         );
-        console.log('Raw reviews:', reviews);
 
         // 날짜 형식 변환
         const formattedReviews = reviews.map(review => {
-            console.log('Processing review date:', review.date);
             const date = review.date ? parseKoreanDate(review.date) : new Date();
             return {
                 ...review,
                 date: date.toISOString()
             };
         });
-        console.log('Formatted reviews:', formattedReviews);
         return formattedReviews;
     } catch (error) {
         console.error('Error in getReviews:', error);
@@ -207,14 +229,12 @@ async function getReviews(placeId) {
 // comment 함수 수정
 async function comment(userNum, DBId, name, title, detail, now) {
     try {
-        console.log('Adding new comment:', { userNum, DBId, name, title, detail, now });
         if (userNum && name) {
             const result = await executeQuery(
                 `INSERT INTO comment(users_num, database_id, name, title, detail, date)
                 VALUES (?, ?, ?, ?, ?, ?)`,
                 [userNum, DBId, name, title, detail, now]
             );
-            console.log('Comment insert result:', result);
             return result.affectedRows > 0;
         }
         return false;
@@ -223,12 +243,6 @@ async function comment(userNum, DBId, name, title, detail, now) {
         return false;
     }
 }
-
-// 비밀번호 해싱
-const hashPassword = async (pw) => {
-    const salt = await bcrypt.genSalt(10);
-    return await bcrypt.hash(pw, salt);
-};
 
 // 미들웨어 설정
 app.use(cors({
@@ -261,8 +275,38 @@ app.post('/regist', async (req, res) => {
     }
 
     if (stat === "register" && ok === 0) {
-        const result = await registData(name, email, id, await hashPassword(pw), tel);
-        return res.json(result);
+        try {
+            // 필수 필드 검사
+            if (!name || !email || !id || !pw || !tel) {
+                return res.json({ success: false, message: "모든 필드를 입력해주세요." });
+            }
+
+            // 아이디 중복 검사
+            const existingUser = await executeQuery('SELECT id FROM users WHERE id = ?', [id]);
+            if (existingUser.length > 0) {
+                return res.json({ success: false, message: "이미 존재하는 아이디입니다." });
+            }
+
+            // 이메일 중복 검사
+            const existingEmail = await executeQuery('SELECT email FROM users WHERE email = ?', [email]);
+            if (existingEmail.length > 0) {
+                return res.json({ success: false, message: "이미 사용 중인 이메일입니다." });
+            }
+
+            // 비밀번호 해싱
+            const hashedPassword = await hashPassword(pw);
+
+            // 회원가입 처리
+            await executeQuery(
+                "INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)",
+                [name, email, id, hashedPassword, tel]
+            );
+            
+            return res.json({ success: true });
+        } catch (error) {
+            console.error('회원가입 오류:', error);
+            return res.json({ success: false, message: "서버 오류가 발생했습니다." });
+        }
     }
 
     res.json({ success: false });
@@ -288,12 +332,9 @@ app.post('/login', async (req, res) => {
 app.post('/about', async (req, res) => {
     const { title, detail, now, placeId } = req.body;
     try {
-        console.log('Received review submission:', { title, detail, now, placeId });
-        console.log('Session info:', req.session);
         
         // 댓글 저장
         const setDB = await comment(req.session.userNum, placeId, req.session.userName, title, detail, now);
-        console.log('Comment save result:', setDB);
 
         if (setDB) {
             // 저장 성공 시 최신 리뷰 목록 반환
@@ -358,8 +399,13 @@ app.post('/user-info', async (req, res) => {
 });
 
 app.get('/all', async (req, res) => {
-    const result = await executeQuery('SELECT id,region,placeName,address,dateType,place,imgName FROM database');
-    res.json(result);
+    try {
+        const data = await executeQuery('SELECT id,region,placeName,address,dateType,place,imgName FROM `database`');
+        res.json(data);
+    } catch (error) {
+        console.error('데이터 조회 오류:', error);
+        res.status(500).json({ error: '데이터를 불러오는 중 오류가 발생했습니다.' });
+    }
 });
 
 app.get('/search', async (req, res) => {
@@ -427,7 +473,7 @@ app.post('/update-user', async (req, res) => {
 
 // placeEx 데이터 조회
 async function getPlaceDetails(placeId) {
-    return await executeQuery('SELECT placeEx FROM database WHERE id = ?', [placeId]);
+    return await executeQuery('SELECT placeEx FROM `database` WHERE id = ?', [placeId]);
 }
 
 // 장소 상세 정보만 조회하는 엔드포인트
@@ -460,7 +506,6 @@ app.get('/place-details/:id', async (req, res) => {
 app.get('/reviews/:placeId', async (req, res) => {
     try {
         const placeId = req.params.placeId;
-        console.log('Received request for placeId:', placeId);
         const reviews = await getReviews(placeId);
         
         res.json({ 
