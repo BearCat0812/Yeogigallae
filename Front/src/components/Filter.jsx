@@ -62,7 +62,18 @@ const Filter = () => {
     const [visible, setVisible] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
     const ref = useRef(null);
-    const isLoggedIn = sessionStorage.getItem('name');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        fetch('http://localhost:8080/session-check', {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(res => res.json())
+        .then(res => {
+            setIsLoggedIn(res.loggedIn);
+        });
+    }, []);
 
     useEffect(() => {
         if (dateType && savedPreferences.places) {

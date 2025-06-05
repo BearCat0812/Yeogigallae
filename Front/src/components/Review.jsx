@@ -1,10 +1,36 @@
 import React, { useState, useEffect } from 'react'
 import './Review.css'
 
-const Review = () => {
+const Review = ({ placeId }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [detail, setDetail] = useState('');
+  const [reviews, setReviews] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    setIsLoggedIn(!!userId);
+  }, []);
+
+  // 리뷰 목록 불러오기
+  useEffect(() => {
+    if (placeId) {
+      fetch(`http://localhost:8080/reviews/${placeId}`, {
+        credentials: 'include'
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setReviews(data.reviews);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching reviews:', error);
+        });
+    }
+  }, [placeId]);
 
   useEffect(() => {
     if (isPopupOpen) {
@@ -19,15 +45,26 @@ const Review = () => {
   }, [isPopupOpen]);
 
   const handleReviewClick = () => {
+    if (!isLoggedIn) {
+      alert('리뷰를 작성하려면 로그인이 필요합니다.');
+      return;
+    }
     setIsPopupOpen(true);
   };
 
   const handleClosePopup = () => {
     setIsPopupOpen(false);
+    setTitle('');
+    setDetail('');
   };
 
   const comment = (e) => {
     e.preventDefault();
+
+    if (!title.trim() || !detail.trim()) {
+      alert('제목과 내용을 모두 입력해주세요.');
+      return;
+    }
 
     const date = new Date();
     const now = date.toLocaleString();
@@ -38,11 +75,21 @@ const Review = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ title, detail, now }),
+      body: JSON.stringify({ title, detail, now, placeId }),
     })
       .then(res => res.json())
-    // .then(res => {
-    // });
+      .then(res => {
+        if (res.success) {
+          setReviews(prevReviews => [res, ...prevReviews]);
+          handleClosePopup();
+        } else {
+          alert(res.message || '리뷰 작성에 실패했습니다.');
+        }
+      })
+      .catch(error => {
+        console.error('Error posting review:', error);
+        alert('리뷰 작성 중 오류가 발생했습니다.');
+      });
   }
 
   return (

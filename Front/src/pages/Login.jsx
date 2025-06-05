@@ -46,7 +46,6 @@ const Login = ({ setIsLoggedIn }) => {
         if (res.success === true) {
           setIsLoggedIn(true);
           localStorage.setItem('userId', id);
-          sessionStorage.setItem('name', res.name);
           alert(`${res.name}님, 환영합니다!`);
           navigate('/select');
         } else {

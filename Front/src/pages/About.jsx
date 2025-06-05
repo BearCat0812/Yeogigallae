@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './About.css'
 import { useLocation, useNavigate } from 'react-router-dom';
 import CardLayout from '../components/CardLayout.jsx';
@@ -8,10 +8,26 @@ const About = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const placeData = location.state;
+  const [placeEx, setPlaceEx] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.state]);
+
+  useEffect(() => {
+    if (placeData?.id) {
+      fetch(`http://localhost:8080/place-details/${placeData.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setPlaceEx(data.placeEx);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching place details:', error);
+        });
+    }
+  }, [placeData?.id]);
 
   if (!placeData) {
     navigate('/');
@@ -21,9 +37,8 @@ const About = () => {
   const handleCardClick = (card) => {
     navigate('/about', { 
       state: { 
-        placeName: card.placeName,
-        address: card.address,
-        imgName: card.imgName
+        ...card,
+        id: card.id
       },
       replace: true
     });
@@ -45,13 +60,13 @@ const About = () => {
                     <li className="address">{placeData.address}</li>
                     <li className="placeEx">
                         <pre>
-{`상세설명[placeEx]`}
+                            {placeEx || '상세 설명을 불러오는 중...'}
                         </pre>
                     </li>
                 </ul>
             </div>
         </div>
-        <Review />
+        <Review placeId={placeData.num} />
         <CardLayout onCardClick={handleCardClick} />
     </div>
   )

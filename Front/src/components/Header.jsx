@@ -14,7 +14,6 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
       .then(res => {
         if (res.success) {
           localStorage.removeItem('userId');
-          sessionStorage.removeItem('name');
           sessionStorage.removeItem('datePreferences');
           sessionStorage.removeItem('searchResults');
           setIsLoggedIn(false);

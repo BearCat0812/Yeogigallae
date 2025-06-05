@@ -29,24 +29,36 @@ const CardLayout = ({ onCardClick }) => {
         return;
       }
 
-      const isLoggedIn = sessionStorage.getItem('name');
-      const preferences = sessionStorage.getItem('datePreferences');
-
-      // 로그인/필터링 상태에 따른 데이터 로드
-      if (!isLoggedIn) {
-        const data = await fetchData('http://localhost:8080/all');
-        setCards(data);
-        return;
-      }
-
-      if (preferences) {
-        const data = await fetchData('http://localhost:8080/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(JSON.parse(preferences))
+      try {
+        const sessionResponse = await fetch('http://localhost:8080/session-check', {
+          method: 'GET',
+          credentials: 'include'
         });
-        setCards(data);
-      } else {
+        const sessionData = await sessionResponse.json();
+        const isLoggedIn = sessionData.loggedIn;
+
+        const preferences = sessionStorage.getItem('datePreferences');
+
+        // 로그인/필터링 상태에 따른 데이터 로드
+        if (!isLoggedIn) {
+          const data = await fetchData('http://localhost:8080/all');
+          setCards(data);
+          return;
+        }
+
+        if (preferences) {
+          const data = await fetchData('http://localhost:8080/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(JSON.parse(preferences))
+          });
+          setCards(data);
+        } else {
+          const data = await fetchData('http://localhost:8080/all');
+          setCards(data);
+        }
+      } catch (error) {
+        console.error('세션 체크 실패:', error);
         const data = await fetchData('http://localhost:8080/all');
         setCards(data);
       }
@@ -77,7 +89,8 @@ const CardLayout = ({ onCardClick }) => {
       state: { 
         placeName: card.placeName,
         address: card.address,
-        imgName: card.imgName
+        imgName: card.imgName,
+        id: card.id
       } 
     });
   };
