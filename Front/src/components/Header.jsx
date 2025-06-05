@@ -8,13 +8,20 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
   const handleLogout = () => {
     fetch('http://localhost:8080/logout', {
       method: 'POST',
-      credentials: 'include',
-    }).then(() => {
-      setIsLoggedIn(false);
-      alert("로그아웃 되었습니다.");
-      navigate('/');
-      window.location.reload();
-    });
+      credentials: 'include'
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          localStorage.removeItem('userId');
+          sessionStorage.removeItem('name');
+          sessionStorage.removeItem('datePreferences');
+          sessionStorage.removeItem('searchResults');
+          setIsLoggedIn(false);
+          navigate('/');
+          window.location.reload();
+        }
+      });
   };
 
   return (

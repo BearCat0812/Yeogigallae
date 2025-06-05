@@ -56,18 +56,75 @@ async function print(region, dateType, places) {
     return await executeQuery(query, params);
 }
 
+// 전화번호 유효성 검사 함수
+const validatePhoneNumber = (tel) => {
+    const phoneRegex = /^010([0-9]{8})$/;
+    return phoneRegex.test(tel);
+};
+
+// 이메일 유효성 검사 함수
+const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return emailRegex.test(email);
+};
+
+// 비밀번호 유효성 검사 함수
+const validatePassword = (pw) => {
+    const pwRegex = /^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
+    return pwRegex.test(pw);
+};
+
+// 아이디 유효성 검사 함수
+const validateId = (id) => {
+    const idRegex = /^[a-zA-Z0-9]{6,20}$/;
+    return idRegex.test(id);
+};
+
 // 회원가입 처리
 async function registData(name, email, id, pw, tel) {
-    if (!name || !email || !id || !pw || !tel) return false;
+    // 필수 필드 검사
+    if (!name || !email || !id || !pw || !tel) {
+        return { success: false, message: "모든 필드를 입력해주세요." };
+    }
 
+    // 이메일 유효성 검사
+    if (!validateEmail(email)) {
+        return { success: false, message: "올바른 이메일 형식이 아닙니다." };
+    }
+
+    // 아이디 유효성 검사
+    if (!validateId(id)) {
+        return { success: false, message: "아이디는 6~20자의 영문 소문자와 숫자만 사용 가능합니다." };
+    }
+
+    // 비밀번호 유효성 검사
+    if (!validatePassword(pw)) {
+        return { success: false, message: "비밀번호는 8~20자의 영문, 숫자, 특수문자를 모두 포함해야 합니다." };
+    }
+
+    // 전화번호 유효성 검사
+    if (!validatePhoneNumber(tel)) {
+        return { success: false, message: "올바른 전화번호 형식이 아닙니다." };
+    }
+
+    // 아이디 중복 검사
     const existingUser = await executeQuery('SELECT id FROM users WHERE id = ?', [id]);
-    if (existingUser.length > 0) return false;
+    if (existingUser.length > 0) {
+        return { success: false, message: "이미 존재하는 아이디입니다." };
+    }
 
+    // 이메일 중복 검사
+    const existingEmail = await executeQuery('SELECT email FROM users WHERE email = ?', [email]);
+    if (existingEmail.length > 0) {
+        return { success: false, message: "이미 사용 중인 이메일입니다." };
+    }
+
+    // 회원가입 처리
     await executeQuery(
         "INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)",
         [name, email, id, pw, tel]
     );
-    return true;
+    return { success: true };
 }
 
 // 로그인 처리
@@ -134,8 +191,8 @@ app.post('/regist', async (req, res) => {
     }
 
     if (stat === "register" && ok === 0) {
-        const success = await registData(name, email, id, await hashPassword(pw), tel);
-        return res.json({ success, id: success ? id : null });
+        const result = await registData(name, email, id, await hashPassword(pw), tel);
+        return res.json(result);
     }
 
     res.json({ success: false });
@@ -183,9 +240,28 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/select', (req, res) => {
-
     return res.json({ name: req.session.userName })
 })
+
+app.post('/user-info', async (req, res) => {
+    const { id } = req.body;
+    try {
+        const user = await executeQuery('SELECT name, email, tel FROM users WHERE id = ?', [id]);
+        if (user.length > 0) {
+            res.json({
+                success: true,
+                name: user[0].name,
+                email: user[0].email,
+                tel: user[0].tel
+            });
+        } else {
+            res.json({ success: false });
+        }
+    } catch (error) {
+        console.error('Error fetching user info:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
 
 app.get('/all', async (req, res) => {
     const result = await executeQuery('SELECT region,placeName,address,dateType,place,imgName FROM database');
@@ -202,6 +278,56 @@ app.get('/session-check', (req, res) => {
         res.json({ loggedIn: true, id: req.session.userId, name: req.session.userName });
     } else {
         res.json({ loggedIn: false });
+    }
+});
+
+app.post('/update-user', async (req, res) => {
+    const { id, name, email, pw, tel } = req.body;
+
+    try {
+        // 필수 필드 검사
+        if (!id || !name || !email || !tel) {
+            return res.json({ success: false, message: "필수 정보가 누락되었습니다." });
+        }
+
+        // 이메일 유효성 검사
+        if (!validateEmail(email)) {
+            return res.json({ success: false, message: "올바른 이메일 형식이 아닙니다." });
+        }
+
+        // 전화번호 유효성 검사
+        if (!validatePhoneNumber(tel)) {
+            return res.json({ success: false, message: "올바른 전화번호 형식이 아닙니다." });
+        }
+
+        // 이메일 중복 검사 (현재 사용자 제외)
+        const existingEmail = await executeQuery('SELECT email FROM users WHERE email = ? AND id != ?', [email, id]);
+        if (existingEmail.length > 0) {
+            return res.json({ success: false, message: "이미 사용 중인 이메일입니다." });
+        }
+
+        // 비밀번호가 제공된 경우에만 유효성 검사
+        if (pw) {
+            if (!validatePassword(pw)) {
+                return res.json({ success: false, message: "비밀번호는 8~20자의 영문, 숫자, 특수문자를 모두 포함해야 합니다." });
+            }
+            // 비밀번호 해싱
+            const hashedPw = await hashPassword(pw);
+            await executeQuery(
+                'UPDATE users SET name = ?, email = ?, pw = ?, tel = ? WHERE id = ?',
+                [name, email, hashedPw, tel, id]
+            );
+        } else {
+            await executeQuery(
+                'UPDATE users SET name = ?, email = ?, tel = ? WHERE id = ?',
+                [name, email, tel, id]
+            );
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.json({ success: false, message: "서버 오류가 발생했습니다." });
     }
 });
 

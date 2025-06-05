@@ -6,7 +6,7 @@ import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Regist from './pages/Regist.jsx';
-import MyPage from './pages/MyPage.jsx';
+import Mypage from './pages/Mypage.jsx';
 import Select from './pages/Select.jsx';
 import About from './pages/About.jsx';
 import ScrollToTop from './ScrollToTop';
@@ -37,7 +37,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/regist" element={<Regist />} />
-        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/mypage" element={<Mypage />} />
         <Route path="/select" element={<Select />} />
         <Route path="/About" element={<About />} />
       </Routes>

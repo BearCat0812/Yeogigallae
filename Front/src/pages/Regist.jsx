@@ -31,7 +31,8 @@ const Regist = () => {
     REGEX: {
       ID: /^[a-zA-Z0-9]{6,20}$/,
       PASSWORD: /^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/,
-      MOBILE: /^010([0-9]{8})$/
+      MOBILE: /^010([0-9]{8})$/,
+      EMAIL: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
     },
     ERROR_MESSAGES: {
       ID: {
@@ -47,6 +48,10 @@ const Regist = () => {
       MOBILE: {
         INVALID: "'-' 제외 11자리를 입력해주세요",
         SUCCESS: '유효한 휴대폰 번호입니다'
+      },
+      EMAIL: {
+        INVALID: "올바른 이메일 형식이 아닙니다",
+        SUCCESS: "유효한 이메일입니다"
       }
     }
   };
@@ -98,8 +103,49 @@ const Regist = () => {
     }
   };
 
+  const validateEmail = (email) => {
+    return CONFIG.REGEX.EMAIL.test(email);
+  };
+
   function register(e) {
     e.preventDefault();
+
+    // 필수 필드 검사
+    if (!name.trim() || !email.trim() || !id.trim() || !pw.trim() || !pwRe.trim() || !tel.trim()) {
+      alert("모든 필드를 입력해주세요.");
+      return;
+    }
+
+    // 아이디 중복 확인 검사
+    if (ok !== 0) {
+      alert("아이디 중복 확인을 해주세요.");
+      return;
+    }
+
+    // 이메일 유효성 검사
+    if (!validateEmail(email)) {
+      alert("올바른 이메일 형식이 아닙니다.");
+      return;
+    }
+
+    // 비밀번호 유효성 검사
+    if (!CONFIG.REGEX.PASSWORD.test(pw)) {
+      alert("비밀번호 형식이 올바르지 않습니다.");
+      return;
+    }
+
+    // 비밀번호 확인 검사
+    if (pw !== pwRe) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    // 전화번호 유효성 검사
+    if (!CONFIG.REGEX.MOBILE.test(tel)) {
+      alert("올바른 전화번호 형식이 아닙니다.");
+      return;
+    }
+
     fetch("http://localhost:8080/regist", {
       method: 'POST',
       headers: {
@@ -113,7 +159,7 @@ const Regist = () => {
           alert("회원가입이 정상적으로 완료되었습니다.");
           navigate('/login');
         } else {
-          alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+          alert(res.message || "회원가입에 실패했습니다. 다시 시도해주세요.");
         }
       });
   }
