@@ -5,16 +5,26 @@ import './Select.css';
 import { useEffect } from 'react';
 
 const indoorOptions = [
-  { id: 'gourmet', label: '맛집' },
-  { id: 'cafe', label: '카페' },
-  { id: 'restaurant', label: '레스토랑' },
-  { id: 'museum', label: '미술관/박물관' },
-  { id: 'movie', label: '영화관' },
-  { id: 'exhibition', label: '전시회' },
+  { id: 'aquarium', label: '아쿠아리움' },
+  { id: 'bar', label: '바' },
   { id: 'boardgame_cafe', label: '보드게임 카페' },
-  { id: 'karaoke', label: '노래방' },
+  { id: 'book', label: '서점/책방' },
+  { id: 'cafe', label: '카페' },
+  { id: 'cathedral', label: '성당/교회' },
   { id: 'cooking_class', label: '요리 교실' },
+  { id: 'exhibition', label: '전시회' },
+  { id: 'game', label: '게임/방탈출' },
+  { id: 'karaoke', label: '노래방' },
+  { id: 'movie', label: '영화관' },
+  { id: 'museum', label: '미술관/박물관' },
+  { id: 'observatory', label: '전망대' },
+  { id: 'offline_store', label: '오프라인 매장' },
+  { id: 'restaurant', label: '레스토랑' },
   { id: 'spa', label: '스파/찜질방' },
+  { id: 'sports', label: '실내 스포츠' },
+  { id: 'studio', label: '촬영 스튜디오' },
+  { id: 'thema_cafe', label: '테마 카페' },
+  { id: 'workshop', label: '공방 체험' },
 ];
 
 const outdoorOptions = [
