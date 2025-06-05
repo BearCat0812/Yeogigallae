@@ -36,8 +36,6 @@
 .review-container > ul > li > ul > li:nth-child(1) {
     font-size: 20px;
     font-family: 'Bold', sans-serif;
-    border-bottom: 1px solid #7b7b7b;
-    padding-bottom: 5px;
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
@@ -47,6 +45,8 @@
 }
 
 .review-container > ul > li > ul > li:nth-child(2) {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
     color: #7b7b7b;
     display: flex;
 }
@@ -174,4 +174,45 @@
 .review-popup-buttons > button[type="button"] {
     background-color: #666;
     color: white;
+}
+
+/* 리뷰 상세 팝업 스타일 */
+.review-detail-popup {
+    width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.review-detail-popup::-webkit-scrollbar {
+    width: 8px;
+}
+
+.review-detail-popup::-webkit-scrollbar-thumb {
+    height: 10%;
+    background: #4a93ff;
+    border-radius: 10px;
+}
+
+.review-detail-popup::-webkit-scrollbar-track {
+    background: #dbe9ff;
+}
+
+.review-info {
+    display: flex;
+    justify-content: space-between;
+    color: #7b7b7b;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.review-detail-content {
+    margin-bottom: 30px;
+}
+
+.review-detail-content pre {
+    font-size: 18px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }

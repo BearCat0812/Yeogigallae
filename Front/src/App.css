@@ -32,6 +32,40 @@
 
 html, body {
   background-color: #e9e9e9;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.review-popup-content,
+.group-place,
+.review-form-group textarea {
+  -ms-overflow-style: auto; /* IE and Edge */
+  scrollbar-width: thin; /* Firefox */
+}
+
+.review-popup-content::-webkit-scrollbar,
+.group-place::-webkit-scrollbar,
+.review-form-group textarea::-webkit-scrollbar {
+  display: block;
+  width: 8px;
+}
+
+.review-popup-content::-webkit-scrollbar-thumb,
+.group-place::-webkit-scrollbar-thumb,
+.review-form-group textarea::-webkit-scrollbar-thumb {
+  background: #4a93ff;
+  border-radius: 10px;
+}
+
+.review-popup-content::-webkit-scrollbar-track,
+.group-place::-webkit-scrollbar-track,
+.review-form-group textarea::-webkit-scrollbar-track {
+  background: #dbe9ff;
 }
 
 ul, ol {

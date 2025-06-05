@@ -3,11 +3,13 @@ import './Review.css'
 
 const Review = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState(null);
   const [title, setTitle] = useState('');
   const [detail, setDetail] = useState('');
 
   useEffect(() => {
-    if (isPopupOpen) {
+    if (isPopupOpen || isReviewPopupOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -16,7 +18,7 @@ const Review = () => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isPopupOpen]);
+  }, [isPopupOpen, isReviewPopupOpen]);
 
   const handleReviewClick = () => {
     setIsPopupOpen(true);
@@ -24,6 +26,16 @@ const Review = () => {
 
   const handleClosePopup = () => {
     setIsPopupOpen(false);
+  };
+
+  const handleReviewItemClick = (review) => {
+    setSelectedReview(review);
+    setIsReviewPopupOpen(true);
+  };
+
+  const handleCloseReviewPopup = () => {
+    setIsReviewPopupOpen(false);
+    setSelectedReview(null);
   };
 
   const comment = (e) => {
@@ -53,231 +65,18 @@ const Review = () => {
         <button className="review-plus-btn" onClick={handleReviewClick}>리뷰 작성하기</button>
       </div>
       <ul>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+        <li onClick={() => handleReviewItemClick({
+          title: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
+          user: "User",
+          date: "2025.06.03",
+          detail: `lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
 lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
 lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
 lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
 lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
 lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-        <li>
+`
+        })}>
           <ul>
             <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
             <li>User <span>2025.06.03</span></li>
@@ -294,6 +93,61 @@ lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
           </ul>
         </li>
 
+        <li onClick={() => handleReviewItemClick({
+          title: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
+          user: "User",
+          date: "2025.06.03",
+          detail: `lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+`
+        })}>
+          <ul>
+            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
+            <li>User <span>2025.06.03</span></li>
+            <li>
+              <pre>
+                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
+              </pre>
+            </li>
+          </ul>
+        </li>
+
+        <li onClick={() => handleReviewItemClick({
+          title: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
+          user: "User",
+          date: "2025.06.03",
+          detail: `lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+`
+        })}>
+          <ul>
+            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
+            <li>User <span>2025.06.03</span></li>
+            <li>
+              <pre>
+                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
+              </pre>
+            </li>
+          </ul>
+        </li>
       </ul>
 
       {isPopupOpen && (
@@ -312,6 +166,24 @@ lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
                 <button type="button" onClick={handleClosePopup}>취소</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isReviewPopupOpen && selectedReview && (
+        <div className="review-popup">
+          <div className="review-popup-content review-detail-popup">
+            <span>{selectedReview.title}</span>
+            <div className="review-info">
+              <span>{selectedReview.user}</span>
+              <span>{selectedReview.date}</span>
+            </div>
+            <div className="review-detail-content">
+              <pre>{selectedReview.detail}</pre>
+            </div>
+            <div className="review-popup-buttons">
+              <button type="button" onClick={handleCloseReviewPopup}>닫기</button>
+            </div>
           </div>
         </div>
       )}
