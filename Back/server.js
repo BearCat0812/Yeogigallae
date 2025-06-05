@@ -146,15 +146,81 @@ async function searchData(keyword) {
     );
 }
 
-async function comment(num, DBId, name, title, detail, now) {
-    if (num != undefined && name != null) {
-        const db = await executeQuery(
-            `INSERT INTO comment(users_num,database_id,name,title,detail,date)
-            VALUES (?,?,?,?,?,?)`,
-            [num, DBId, name, title, detail, now]
-        );
+// 한국어 날짜 문자열을 Date 객체로 변환하는 함수
+function parseKoreanDate(dateStr) {
+    try {
+        // "2025. 6. 5. 오후 12:23:30" 형식의 문자열을 파싱
+        const matches = dateStr.match(/(\d+)\.\s*(\d+)\.\s*(\d+)\.\s*(오전|오후)\s*(\d+):(\d+):(\d+)/);
+        if (!matches) return new Date();
 
-        return db.affectedRows > 0;
+        let [_, year, month, day, ampm, hours, minutes, seconds] = matches;
+        
+        // 시간을 24시간 형식으로 변환
+        hours = parseInt(hours);
+        if (ampm === '오후' && hours < 12) hours += 12;
+        if (ampm === '오전' && hours === 12) hours = 0;
+
+        return new Date(
+            parseInt(year),
+            parseInt(month) - 1, // 월은 0-based
+            parseInt(day),
+            hours,
+            parseInt(minutes),
+            parseInt(seconds)
+        );
+    } catch (error) {
+        console.error('Date parsing error:', error);
+        return new Date();
+    }
+}
+
+// 리뷰 조회 함수
+async function getReviews(placeId) {
+    try {
+        console.log('Fetching reviews for placeId:', placeId);
+        const reviews = await executeQuery(
+            `SELECT c.title, c.detail, c.date, c.name as userName 
+             FROM comment c 
+             WHERE c.database_id = ? 
+             ORDER BY c.date DESC`,
+            [placeId]
+        );
+        console.log('Raw reviews:', reviews);
+
+        // 날짜 형식 변환
+        const formattedReviews = reviews.map(review => {
+            console.log('Processing review date:', review.date);
+            const date = review.date ? parseKoreanDate(review.date) : new Date();
+            return {
+                ...review,
+                date: date.toISOString()
+            };
+        });
+        console.log('Formatted reviews:', formattedReviews);
+        return formattedReviews;
+    } catch (error) {
+        console.error('Error in getReviews:', error);
+        return [];
+    }
+}
+
+// comment 함수 수정
+async function comment(userNum, DBId, name, title, detail, now) {
+    try {
+        console.log('Adding new comment:', { userNum, DBId, name, title, detail, now });
+        if (userNum && name) {
+            const result = await executeQuery(
+                `INSERT INTO comment(users_num, database_id, name, title, detail, date)
+                VALUES (?, ?, ?, ?, ?, ?)`,
+                [userNum, DBId, name, title, detail, now]
+            );
+            console.log('Comment insert result:', result);
+            return result.affectedRows > 0;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error in comment function:', error);
+        return false;
     }
 }
 
@@ -222,19 +288,19 @@ app.post('/login', async (req, res) => {
 app.post('/about', async (req, res) => {
     const { title, detail, now, placeId } = req.body;
     try {
-        // 장소 상세 정보 조회
-        const placeDetails = await getPlaceDetails(placeId);
+        console.log('Received review submission:', { title, detail, now, placeId });
+        console.log('Session info:', req.session);
         
         // 댓글 저장
         const setDB = await comment(req.session.userNum, placeId, req.session.userName, title, detail, now);
+        console.log('Comment save result:', setDB);
 
         if (setDB) {
+            // 저장 성공 시 최신 리뷰 목록 반환
+            const reviews = await getReviews(placeId);
             return res.json({ 
                 success: true,
-                title, 
-                detail, 
-                now,
-                placeDetails: placeDetails[0] || null
+                reviews: reviews
             });
         }
         
@@ -383,6 +449,26 @@ app.get('/place-details/:id', async (req, res) => {
         }
     } catch (error) {
         console.error('Error in /place-details:', error);
+        res.json({ 
+            success: false, 
+            message: "서버 오류가 발생했습니다." 
+        });
+    }
+});
+
+// 리뷰 조회 API
+app.get('/reviews/:placeId', async (req, res) => {
+    try {
+        const placeId = req.params.placeId;
+        console.log('Received request for placeId:', placeId);
+        const reviews = await getReviews(placeId);
+        
+        res.json({ 
+            success: true, 
+            reviews: reviews 
+        });
+    } catch (error) {
+        console.error('Error in /reviews:', error);
         res.json({ 
             success: false, 
             message: "서버 오류가 발생했습니다." 

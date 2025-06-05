@@ -7,6 +7,20 @@ const Review = ({ placeId }) => {
   const [selectedReview, setSelectedReview] = useState(null);
   const [title, setTitle] = useState('');
   const [detail, setDetail] = useState('');
+  const [reviews, setReviews] = useState([]);
+
+  // 리뷰 데이터 로드
+  useEffect(() => {
+    fetch(`http://localhost:8080/reviews/${placeId}`)
+      .then(res => res.json())
+      .then(data => {
+        setReviews(data.reviews || []); // 서버 응답에서 reviews 배열을 가져오거나, 없으면 빈 배열 사용
+      })
+      .catch(error => {
+        console.error('리뷰 목록 조회 실패:', error);
+        setReviews([]); // 에러 발생 시 빈 배열로 설정
+      });
+  }, [placeId]);
 
   useEffect(() => {
     if (isPopupOpen || isReviewPopupOpen) {
@@ -40,10 +54,20 @@ const Review = ({ placeId }) => {
 
   const comment = (e) => {
     e.preventDefault();
+    
+    // 제목과 내용이 비어있는지 검증
+    if (!title.trim()) {
+      alert('제목을 입력해 주세요.');
+      return;
+    }
+    
+    if (!detail.trim()) {
+      alert('내용을 입력해 주세요.');
+      return;
+    }
 
     const date = new Date();
     const now = date.toLocaleString();
-    console.log(now);
 
     fetch("http://localhost:8080/about", {
       method: 'POST',
@@ -54,9 +78,34 @@ const Review = ({ placeId }) => {
       body: JSON.stringify({ title, detail, now, placeId }),
     })
       .then(res => res.json())
-    // .then(res => {
-    // });
-  }
+      .then(data => {
+        if (data.success) {
+          // 리뷰 작성 성공 시 리뷰 목록 새로고침
+          fetch(`http://localhost:8080/reviews/${placeId}`)
+            .then(res => res.json())
+            .then(data => {
+              setReviews(data.reviews || []);
+              alert('리뷰가 등록되었습니다!');
+            })
+            .catch(error => {
+              console.error('리뷰 목록 조회 실패:', error);
+              setReviews([]);
+            });
+
+          // 입력 필드 초기화
+          setTitle('');
+          setDetail('');
+          // 팝업 닫기
+          setIsPopupOpen(false);
+        } else {
+          alert('리뷰 등록에 실패했습니다. 다시 시도해 주세요.');
+        }
+      })
+      .catch(error => {
+        console.error('리뷰 작성 실패:', error);
+        alert('일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      });
+  };
 
   return (
     <div className="review-container container">
@@ -64,91 +113,28 @@ const Review = ({ placeId }) => {
         <p>어땠어요? 솔직한 한마디!</p>
         <button className="review-plus-btn" onClick={handleReviewClick}>리뷰 작성하기</button>
       </div>
-      <ul>
-        <li onClick={() => handleReviewItemClick({
-          title: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
-          user: "User",
-          date: "2025.06.03",
-          detail: `lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-`
-        })}>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
+      {reviews.length === 0 ? (
+        <div className="no-reviews">
+          <p>아직 작성된 리뷰가 없습니다.</p>
+          <p>첫 번째 리뷰의 주인공이 되어주세요.</p>
+        </div>
+      ) : (
+        <ul>
+          {reviews.map((review, index) => (
+            <li key={index} onClick={() => handleReviewItemClick(review)}>
+              <ul>
+                <li>{review.title}</li>
+                <li>{review.userName} <span>
+                  {`${new Date(review.date).getFullYear()}-${String(new Date(review.date).getMonth() + 1).padStart(2, '0')}-${String(new Date(review.date).getDate()).padStart(2, '0')} ${String(new Date(review.date).getHours()).padStart(2, '0')}:${String(new Date(review.date).getMinutes()).padStart(2, '0')}`}
+                </span></li>
+                <li>
+                  <pre>{review.detail}</pre>
+                </li>
+              </ul>
             </li>
-          </ul>
-        </li>
-
-        <li onClick={() => handleReviewItemClick({
-          title: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
-          user: "User",
-          date: "2025.06.03",
-          detail: `lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-`
-        })}>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-
-        <li onClick={() => handleReviewItemClick({
-          title: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
-          user: "User",
-          date: "2025.06.03",
-          detail: `lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-`
-        })}>
-          <ul>
-            <li>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-            <li>User <span>2025.06.03</span></li>
-            <li>
-              <pre>
-                {`lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
-              </pre>
-            </li>
-          </ul>
-        </li>
-      </ul>
+          ))}
+        </ul>
+      )}
 
       {isPopupOpen && (
         <div className="review-popup">
@@ -156,10 +142,19 @@ lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
             <span>리뷰 작성하기</span>
             <form>
               <div className="review-form-group">
-                <input type="text" onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력해주세요." />
+                <input 
+                  type="text" 
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)} 
+                  placeholder="제목을 입력해주세요." 
+                />
               </div>
               <div className="review-form-group">
-                <textarea onChange={(e) => setDetail(e.target.value)} placeholder="내용을 입력해주세요."></textarea>
+                <textarea 
+                  value={detail}
+                  onChange={(e) => setDetail(e.target.value)} 
+                  placeholder="내용을 입력해주세요."
+                ></textarea>
               </div>
               <div className="review-popup-buttons">
                 <button type="submit" onClick={comment}>작성완료</button>
@@ -175,8 +170,10 @@ lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.`}
           <div className="review-popup-content review-detail-popup">
             <span>{selectedReview.title}</span>
             <div className="review-info">
-              <span>{selectedReview.user}</span>
-              <span>{selectedReview.date}</span>
+              <span>{selectedReview.userName}</span>
+              <span>
+                {`${new Date(selectedReview.date).getFullYear()}-${String(new Date(selectedReview.date).getMonth() + 1).padStart(2, '0')}-${String(new Date(selectedReview.date).getDate()).padStart(2, '0')} ${String(new Date(selectedReview.date).getHours()).padStart(2, '0')}:${String(new Date(selectedReview.date).getMinutes()).padStart(2, '0')}`}
+              </span>
             </div>
             <div className="review-detail-content">
               <pre>{selectedReview.detail}</pre>
