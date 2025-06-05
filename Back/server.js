@@ -146,9 +146,13 @@ async function searchData(keyword) {
     );
 }
 
-async function comment(num, name, title, detail, now) {
+async function comment(num, DBId, name, title, detail, now) {
     if (num != undefined && name != null) {
-        const db = await executeQuery("INSERT INTO comment(num,name,title,detail,date) VALUES (?,?,?,?,?)", [num, name, title, detail, now]);
+        const db = await executeQuery(
+            `INSERT INTO comment(users_num,database_id,name,title,detail,date)
+            VALUES (?,?,?,?,?,?)`,
+            [num, DBId, name, title, detail, now]
+        );
 
         return db.affectedRows > 0;
     }
@@ -222,7 +226,7 @@ app.post('/about', async (req, res) => {
         const placeDetails = await getPlaceDetails(placeId);
         
         // 댓글 저장
-        const setDB = await comment(req.session.userNum, req.session.userName, title, detail, now);
+        const setDB = await comment(req.session.userNum, placeId, req.session.userName, title, detail, now);
 
         if (setDB) {
             return res.json({ 

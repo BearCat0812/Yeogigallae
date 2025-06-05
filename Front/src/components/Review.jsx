@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './Review.css'
 
-const Review = () => {
+const Review = ({ placeId }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
@@ -51,7 +51,7 @@ const Review = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ title, detail, now }),
+      body: JSON.stringify({ title, detail, now, placeId }),
     })
       .then(res => res.json())
     // .then(res => {

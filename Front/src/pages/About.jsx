@@ -66,7 +66,7 @@ const About = () => {
                 </ul>
             </div>
         </div>
-        <Review placeId={placeData.num} />
+        <Review placeId={placeData.id} />
         <CardLayout onCardClick={handleCardClick} />
     </div>
   )
