@@ -49,22 +49,6 @@ const Select = () => {
       });
   }, []); // 컴포넌트가 처음 렌더링될 때 한 번 실행
 
-  // useEffect(() => {
-  //   fetch('http://localhost:8080/session-check', {
-  //     method: 'GET',
-  //     credentials: 'include',
-  //   })
-  //     .then(res => res.json())
-  //     .then(res => {
-  //       if (res.loggedIn) {
-  //         setName(res.name);
-  //       } else {
-  //         alert("로그인 상태가 아닙니다. 다시 로그인해주세요.");
-  //         navigate('/login');
-  //       }
-  //     });
-  // }, []);
-
   const handleRegionClick = (id) => {
     setSelectedRegion((prev) => (prev === id ? '' : id));
     setDateType('');
