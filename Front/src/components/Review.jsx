@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import './Review.css'
+import { useNavigate } from 'react-router-dom';
 
 const Review = ({ placeId }) => {
+  const navigate = useNavigate();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
   const [title, setTitle] = useState('');
   const [detail, setDetail] = useState('');
   const [reviews, setReviews] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    fetch('http://localhost:8080/session-check', {
+      method: 'GET',
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(res => {
+      setIsLoggedIn(res.loggedIn);
+    });
+  }, []);
 
   // 리뷰 데이터 로드
   useEffect(() => {
@@ -35,6 +50,11 @@ const Review = ({ placeId }) => {
   }, [isPopupOpen, isReviewPopupOpen]);
 
   const handleReviewClick = () => {
+    if (!isLoggedIn) {
+      alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
+      return;
+    }
     setIsPopupOpen(true);
   };
 
@@ -55,6 +75,12 @@ const Review = ({ placeId }) => {
   const comment = (e) => {
     e.preventDefault();
     
+    if (!isLoggedIn) {
+      alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
+      return;
+    }
+
     // 제목과 내용이 비어있는지 검증
     if (!title.trim()) {
       alert('제목을 입력해 주세요.');
@@ -111,7 +137,12 @@ const Review = ({ placeId }) => {
     <div className="review-container container">
       <div className="review-plus">
         <p>어땠어요? 솔직한 한마디!</p>
-        <button className="review-plus-btn" onClick={handleReviewClick}>리뷰 작성하기</button>
+        <button 
+          className={`review-plus-btn ${!isLoggedIn ? 'not-logged-in' : ''}`} 
+          onClick={handleReviewClick}
+        >
+          {isLoggedIn ? '리뷰 작성하기' : '로그인하고 리뷰 작성하기'}
+        </button>
       </div>
       {reviews.length === 0 ? (
         <div className="no-reviews">

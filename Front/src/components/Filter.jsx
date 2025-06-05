@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import './Filter.css';
 
 const options = {
@@ -54,6 +55,7 @@ const options = {
 };
 
 const Filter = () => {
+    const navigate = useNavigate();
     const savedPreferences = JSON.parse(sessionStorage.getItem('datePreferences') || '{}');
     
     const [region, setRegion] = useState(savedPreferences.region || '');
@@ -160,11 +162,10 @@ const Filter = () => {
         }
     };
 
-    const handleSearchFocus = (e) => {
+    const handleFilterClick = (e) => {
         if (!isLoggedIn) {
-            e.preventDefault();
-            e.target.blur();
             alert('로그인이 필요한 서비스입니다.');
+            navigate('/login');
             return;
         }
         setVisible(true);
@@ -178,8 +179,21 @@ const Filter = () => {
                     name={name}
                     value={id}
                     checked={value === id}
-                    onChange={() => onChange(id)}
+                    onChange={() => {
+                        if (!isLoggedIn) {
+                            alert('로그인이 필요한 서비스입니다.');
+                            navigate('/login');
+                            return;
+                        }
+                        onChange(id);
+                    }}
                     onClick={e => {
+                        if (!isLoggedIn) {
+                            e.preventDefault();
+                            alert('로그인이 필요한 서비스입니다.');
+                            navigate('/login');
+                            return;
+                        }
                         if (value === id) {
                             e.preventDefault();
                             onChange('');
@@ -193,7 +207,18 @@ const Filter = () => {
     const renderCheckboxGroup = items =>
         items.map(({ id, label }) => (
             <label key={id} className={`radio-label ${places.includes(id) ? 'checked' : ''}`}>
-                <input type="checkbox" checked={places.includes(id)} onChange={() => handlePlace(id)} />
+                <input 
+                    type="checkbox" 
+                    checked={places.includes(id)} 
+                    onChange={() => {
+                        if (!isLoggedIn) {
+                            alert('로그인이 필요한 서비스입니다.');
+                            navigate('/login');
+                            return;
+                        }
+                        handlePlace(id);
+                    }} 
+                />
                 <span>{label}</span>
             </label>
         ));
@@ -211,7 +236,7 @@ const Filter = () => {
                         value={searchKeyword}
                         onChange={handleSearchInput}
                         placeholder={isLoggedIn ? "지금 딱, 가고 싶은 데이트 장소는?" : "회원 가입하고 더 많은 기능을 이용해보세요!"}
-                        onFocus={handleSearchFocus}
+                        onClick={handleFilterClick}
                         className={!isLoggedIn ? "disabled" : ""}
                         autoComplete="off"
                     />
@@ -219,7 +244,7 @@ const Filter = () => {
             </div>
 
             <AnimatePresence>
-                {visible && isLoggedIn && (
+                {visible && (
                     <motion.div
                         className="filter-container"
                         initial={{ height: 0 }}
