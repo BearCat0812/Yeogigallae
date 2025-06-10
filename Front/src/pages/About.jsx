@@ -9,7 +9,7 @@ const About = () => {
   const navigate = useNavigate();
   const placeData = location.state;
   const [placeEx, setPlaceEx] = useState(null);
-  const [click, setClick] = useState(true);
+  const [click, setClick] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -30,6 +30,18 @@ const About = () => {
     }
   }, [placeData?.id]);
 
+  /* 찜 데이터 호출 */
+  useEffect(() => {
+    fetch(`http://localhost:8080/dibs/${placeData.id}`, {
+      credentials: 'include'
+    })
+      .then(res => res.json())
+      .then(res => {
+        setClick(res.result);
+      })
+  }, [placeData?.id]);
+
+
   if (!placeData) {
     navigate('/');
     return null;
@@ -38,7 +50,10 @@ const About = () => {
   /* 찜 눌리면 작동 */
   const dibs = (e) => {
     e.preventDefault();
-    if (click) {
+    const newClickState = !click;
+    setClick(newClickState); // 즉시 상태 업데이트
+
+    if (!click) {
       fetch("http://localhost:8080/dibs", {
         method: 'POST',
         headers: {
@@ -46,8 +61,10 @@ const About = () => {
         },
         credentials: 'include',
         body: JSON.stringify({ placeId: placeData.id }),
-      }).then(setClick(false));
-    } else if (!click) {
+      }).then(res => {
+        if (!res.ok) setClick(!newClickState); // 실패 시 원래 상태로 되돌림
+      });
+    } else if (click) {
       fetch("http://localhost:8080/dibs-delete", {
         method: 'POST',
         headers: {
@@ -55,7 +72,9 @@ const About = () => {
         },
         credentials: 'include',
         body: JSON.stringify({ placeId: placeData.id }),
-      }).then(setClick(true));
+      }).then(res => {
+        if (!res.ok) setClick(!newClickState); // 실패 시 원래 상태로 되돌림
+      });
     }
   };
 
@@ -86,8 +105,18 @@ const About = () => {
             <li className="address">{placeData.address}</li>
             <li className="placeEx">
               {/* 임시 찜 버튼 */}
-              <button onClick={dibs}>찜</button>
-
+              <button
+                id='dibs'
+                onClick={dibs}
+                style={{
+                  width: '100px',
+                  backgroundColor: click ? 'blue' : 'white',
+                  color: click ? 'white' : 'black',
+                  border: '1px solid #ccc'
+                }}
+              >
+                찜
+              </button>
               <pre>
                 {placeEx || '상세 설명을 불러오는 중...'}
               </pre>

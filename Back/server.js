@@ -401,7 +401,9 @@ app.post('/user-info', async (req, res) => {
 /* 찜 DB 저장 */
 app.post('/dibs', async (req, res) => {
     const { placeId } = req.body;
-    if (req.session.userId) {
+    const check = await executeQuery('SELECT users_num,database_id FROM dibs WHERE users_num = ? AND database_id = ?', [req.session.userNum, placeId]);
+
+    if (req.session.userId && check.length == 0) {
         await executeQuery('INSERT INTO dibs(users_num,database_id) VALUES (?,?)', [req.session.userNum, placeId]);
     }
 })
@@ -409,11 +411,22 @@ app.post('/dibs', async (req, res) => {
 /* 찜 DB 삭제 */
 app.post('/dibs-delete', async (req, res) => {
     const { placeId } = req.body;
-    if (req.session.userId) {
+    const check = await executeQuery('SELECT users_num,database_id FROM dibs WHERE users_num = ? AND database_id = ?', [req.session.userNum, placeId]);
+
+    if (req.session.userId && check.length > 0) {
         await executeQuery('DELETE FROM dibs WHERE users_num = ? AND database_id = ?', [req.session.userNum, placeId]);
     }
 })
 
+app.get('/dibs/:id', async (req, res) => {
+    const data = await executeQuery('SELECT users_num,database_id FROM dibs WHERE users_num = ? AND database_id = ?', [req.session.userNum, req.params.id]);
+
+    if (data.length > 0) {
+        return res.json({ result: true });
+    } else {
+        return res.json({ result: false });
+    }
+})
 
 app.get('/all', async (req, res) => {
     try {
