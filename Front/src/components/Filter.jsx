@@ -57,7 +57,7 @@ const options = {
 const Filter = () => {
     const navigate = useNavigate();
     const savedPreferences = JSON.parse(sessionStorage.getItem('datePreferences') || '{}');
-    
+
     const [region, setRegion] = useState(savedPreferences.region || '');
     const [dateType, setDateType] = useState(savedPreferences.dateType || '');
     const [places, setPlaces] = useState(savedPreferences.places || []);
@@ -71,10 +71,10 @@ const Filter = () => {
             method: 'GET',
             credentials: 'include'
         })
-        .then(res => res.json())
-        .then(res => {
-            setIsLoggedIn(res.loggedIn);
-        });
+            .then(res => res.json())
+            .then(res => {
+                setIsLoggedIn(res.loggedIn);
+            });
     }, []);
 
     useEffect(() => {
@@ -104,6 +104,7 @@ const Filter = () => {
         e.preventDefault();
         if (!isLoggedIn) {
             alert('로그인이 필요한 서비스입니다.');
+            navigate('/login');
             return;
         }
 
@@ -136,7 +137,7 @@ const Filter = () => {
 
     const handleSearch = async (keyword) => {
         if (!keyword.trim()) return;
-        
+
         try {
             const response = await fetch(`http://localhost:8080/search?keyword=${encodeURIComponent(keyword)}`);
             const data = await response.json();
@@ -162,7 +163,7 @@ const Filter = () => {
         }
     };
 
-    const handleFilterClick = (e) => {
+    const handleFilterClick = () => {
         if (!isLoggedIn) {
             alert('로그인이 필요한 서비스입니다.');
             navigate('/login');
@@ -207,9 +208,9 @@ const Filter = () => {
     const renderCheckboxGroup = items =>
         items.map(({ id, label }) => (
             <label key={id} className={`radio-label ${places.includes(id) ? 'checked' : ''}`}>
-                <input 
-                    type="checkbox" 
-                    checked={places.includes(id)} 
+                <input
+                    type="checkbox"
+                    checked={places.includes(id)}
                     onChange={() => {
                         if (!isLoggedIn) {
                             alert('로그인이 필요한 서비스입니다.');
@@ -217,7 +218,7 @@ const Filter = () => {
                             return;
                         }
                         handlePlace(id);
-                    }} 
+                    }}
                 />
                 <span>{label}</span>
             </label>

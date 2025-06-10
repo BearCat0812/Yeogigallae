@@ -10,6 +10,20 @@ const About = () => {
   const placeData = location.state;
   const [placeEx, setPlaceEx] = useState(null);
   const [click, setClick] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    fetch('http://localhost:8080/session-check', {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then(res => res.json())
+      .then(res => {
+        setIsLoggedIn(res.loggedIn);
+      });
+  }, []);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -50,6 +64,13 @@ const About = () => {
   /* 찜 눌리면 작동 */
   const dibs = (e) => {
     e.preventDefault();
+
+    if (!isLoggedIn) {
+      alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
+      return;
+    }
+
     const newClickState = !click;
     setClick(newClickState); // 즉시 상태 업데이트
 
