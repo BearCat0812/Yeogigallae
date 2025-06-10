@@ -180,7 +180,7 @@ function parseKoreanDate(dateStr) {
         if (!matches) return new Date();
 
         let [_, year, month, day, ampm, hours, minutes, seconds] = matches;
-        
+
         // 시간을 24시간 형식으로 변환
         hours = parseInt(hours);
         if (ampm === '오후' && hours < 12) hours += 12;
@@ -301,7 +301,7 @@ app.post('/regist', async (req, res) => {
                 "INSERT INTO users(name,email,id,pw,tel) VALUES (?,?,?,?,?)",
                 [name, email, id, hashedPassword, tel]
             );
-            
+
             return res.json({ success: true });
         } catch (error) {
             console.error('회원가입 오류:', error);
@@ -332,28 +332,28 @@ app.post('/login', async (req, res) => {
 app.post('/about', async (req, res) => {
     const { title, detail, now, placeId } = req.body;
     try {
-        
+
         // 댓글 저장
         const setDB = await comment(req.session.userNum, placeId, req.session.userName, title, detail, now);
 
         if (setDB) {
             // 저장 성공 시 최신 리뷰 목록 반환
             const reviews = await getReviews(placeId);
-            return res.json({ 
+            return res.json({
                 success: true,
                 reviews: reviews
             });
         }
-        
-        res.json({ 
-            success: false, 
-            message: "댓글 저장에 실패했습니다." 
+
+        res.json({
+            success: false,
+            message: "댓글 저장에 실패했습니다."
         });
     } catch (error) {
         console.error('Error in /about:', error);
-        res.json({ 
-            success: false, 
-            message: "서버 오류가 발생했습니다." 
+        res.json({
+            success: false,
+            message: "서버 오류가 발생했습니다."
         });
     }
 });
@@ -397,6 +397,23 @@ app.post('/user-info', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 });
+
+/* 찜 DB 저장 */
+app.post('/dibs', async (req, res) => {
+    const { placeId } = req.body;
+    if (req.session.userId) {
+        await executeQuery('INSERT INTO dibs(users_num,database_id) VALUES (?,?)', [req.session.userNum, placeId]);
+    }
+})
+
+/* 찜 DB 삭제 */
+app.post('/dibs-delete', async (req, res) => {
+    const { placeId } = req.body;
+    if (req.session.userId) {
+        await executeQuery('DELETE FROM dibs WHERE users_num = ? AND database_id = ?', [req.session.userNum, placeId]);
+    }
+})
+
 
 app.get('/all', async (req, res) => {
     try {
@@ -481,23 +498,23 @@ app.get('/place-details/:id', async (req, res) => {
     try {
         const placeId = req.params.id;
         const placeEx = await getPlaceDetails(placeId);
-        
+
         if (placeEx.length > 0) {
-            res.json({ 
-                success: true, 
-                placeEx: placeEx[0].placeEx 
+            res.json({
+                success: true,
+                placeEx: placeEx[0].placeEx
             });
         } else {
-            res.json({ 
-                success: false, 
-                message: "장소를 찾을 수 없습니다." 
+            res.json({
+                success: false,
+                message: "장소를 찾을 수 없습니다."
             });
         }
     } catch (error) {
         console.error('Error in /place-details:', error);
-        res.json({ 
-            success: false, 
-            message: "서버 오류가 발생했습니다." 
+        res.json({
+            success: false,
+            message: "서버 오류가 발생했습니다."
         });
     }
 });
@@ -507,16 +524,16 @@ app.get('/reviews/:placeId', async (req, res) => {
     try {
         const placeId = req.params.placeId;
         const reviews = await getReviews(placeId);
-        
-        res.json({ 
-            success: true, 
-            reviews: reviews 
+
+        res.json({
+            success: true,
+            reviews: reviews
         });
     } catch (error) {
         console.error('Error in /reviews:', error);
-        res.json({ 
-            success: false, 
-            message: "서버 오류가 발생했습니다." 
+        res.json({
+            success: false,
+            message: "서버 오류가 발생했습니다."
         });
     }
 });

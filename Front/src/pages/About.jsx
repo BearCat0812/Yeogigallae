@@ -9,6 +9,7 @@ const About = () => {
   const navigate = useNavigate();
   const placeData = location.state;
   const [placeEx, setPlaceEx] = useState(null);
+  const [click, setClick] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -34,9 +35,34 @@ const About = () => {
     return null;
   }
 
+  /* 찜 눌리면 작동 */
+  const dibs = (e) => {
+    e.preventDefault();
+    if (click) {
+      fetch("http://localhost:8080/dibs", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ placeId: placeData.id }),
+      }).then(setClick(false));
+    } else if (!click) {
+      fetch("http://localhost:8080/dibs-delete", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ placeId: placeData.id }),
+      }).then(setClick(true));
+    }
+  };
+
+
   const handleCardClick = (card) => {
-    navigate('/about', { 
-      state: { 
+    navigate('/about', {
+      state: {
         ...card,
         id: card.id
       },
@@ -46,28 +72,31 @@ const About = () => {
 
   return (
     <div className="about-container">
-        <div className="about-box">
-            <div className="about-box-left">
-                <div className="box-img">
-                    <img src={`/dbImages/${placeData.imgName}`} alt={placeData.placeName} />
-                </div>
-                <div className="box-img-shadow"></div>
-            </div>
-            <div className="about-box-right">
-                <ul>
-                    <li className="italic">about</li>
-                    <li className="placeName">{placeData.placeName}</li>
-                    <li className="address">{placeData.address}</li>
-                    <li className="placeEx">
-                        <pre>
-                            {placeEx || '상세 설명을 불러오는 중...'}
-                        </pre>
-                    </li>
-                </ul>
-            </div>
+      <div className="about-box">
+        <div className="about-box-left">
+          <div className="box-img">
+            <img src={`/dbImages/${placeData.imgName}`} alt={placeData.placeName} />
+          </div>
+          <div className="box-img-shadow"></div>
         </div>
-        <Review placeId={placeData.id} />
-        <CardLayout onCardClick={handleCardClick} />
+        <div className="about-box-right">
+          <ul>
+            <li className="italic">about</li>
+            <li className="placeName">{placeData.placeName}</li>
+            <li className="address">{placeData.address}</li>
+            <li className="placeEx">
+              {/* 임시 찜 버튼 */}
+              <button onClick={dibs}>찜</button>
+
+              <pre>
+                {placeEx || '상세 설명을 불러오는 중...'}
+              </pre>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <Review placeId={placeData.id} />
+      <CardLayout onCardClick={handleCardClick} />
     </div>
   )
 }
