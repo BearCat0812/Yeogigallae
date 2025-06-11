@@ -178,6 +178,11 @@
     color: white;
 }
 
+.review-popup-buttons > button.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+
 /* 리뷰 상세 팝업 스타일 */
 .review-detail-popup {
     width: 800px;

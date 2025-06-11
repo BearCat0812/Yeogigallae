@@ -49,13 +49,15 @@ const Select = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:8080/select', {
-      method: 'POST',
-      credentials: 'include',
+    fetch('http://localhost:8080/session-check', {
+      method: 'GET',
+      credentials: 'include'
     })
       .then(res => res.json())
       .then(res => {
-        setName(res.name); // ✅ 이렇게 써야 정상 작동
+        if (res.loggedIn) {
+          setName(res.name);
+        }
       });
   }, []); // 컴포넌트가 처음 렌더링될 때 한 번 실행
 

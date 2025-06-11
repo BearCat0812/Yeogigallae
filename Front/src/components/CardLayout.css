@@ -26,9 +26,9 @@
 .section > div {
     position: relative;
     height: 300px;
-    background-color: #222;
-    border-radius: 20px;
     overflow: hidden;
+    background: #222;
+    border-radius: 20px;
 }
 
 .overlay {
@@ -64,6 +64,10 @@
     align-items: start;
 }
 
+.overlay > ul > li:last-child {
+    font-size: 20px;
+}
+
 .overlay > span {
     display: flex;
     flex-direction: column;
@@ -85,10 +89,10 @@
 }
 
 .section > div > .card-section > img {
-    width: 80%;
-    height: 75%;
-    object-fit: cover;
+    width: 85%;
+    height: 80%;
     border-radius: 20px;
+    object-fit: cover;
 }
 
 p.no-results {

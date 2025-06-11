@@ -11,6 +11,7 @@ const Review = ({ placeId }) => {
   const [detail, setDetail] = useState('');
   const [reviews, setReviews] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUserNum, setCurrentUserNum] = useState(null);
 
   // 로그인 상태 확인
   useEffect(() => {
@@ -21,6 +22,9 @@ const Review = ({ placeId }) => {
     .then(res => res.json())
     .then(res => {
       setIsLoggedIn(res.loggedIn);
+      if (res.loggedIn) {
+        setCurrentUserNum(res.userNum);
+      }
     });
   }, []);
 
@@ -133,6 +137,33 @@ const Review = ({ placeId }) => {
       });
   };
 
+  const handleDeleteReview = async (review) => {
+    if (!window.confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/reviews/${placeId}/${review.users_num}/${review.num}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('리뷰가 삭제되었습니다.');
+        // 리뷰 목록에서 삭제된 리뷰 제거
+        setReviews(reviews.filter(r => r.num !== review.num));
+        setIsReviewPopupOpen(false);
+      } else {
+        alert(data.message || '리뷰 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('리뷰 삭제 실패:', error);
+      alert('리뷰 삭제 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <div className="review-container container">
       <div className="review-plus">
@@ -210,6 +241,15 @@ const Review = ({ placeId }) => {
               <pre>{selectedReview.detail}</pre>
             </div>
             <div className="review-popup-buttons">
+              {currentUserNum === selectedReview.users_num && (
+                <button 
+                  type="button" 
+                  onClick={() => handleDeleteReview(selectedReview)}
+                  className="delete-button"
+                >
+                  삭제
+                </button>
+              )}
               <button type="button" onClick={handleCloseReviewPopup}>닫기</button>
             </div>
           </div>

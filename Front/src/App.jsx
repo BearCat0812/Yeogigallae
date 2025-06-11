@@ -11,6 +11,7 @@ import MyPageEdit from './pages/MyPageEdit.jsx';
 import Select from './pages/Select.jsx';
 import About from './pages/About.jsx';
 import ScrollToTop from './ScrollToTop';
+import DibsList from './pages/DibsList';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,10 +39,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/regist" element={<Regist />} />
-        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/mypage" element={<MyPage setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/mypage/edit" element={<MyPageEdit />} />
         <Route path="/select" element={<Select />} />
         <Route path="/About" element={<About />} />
+        <Route path="/dibs" element={<DibsList />} />
       </Routes>
       <Footer />
     </div>

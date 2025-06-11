@@ -1,7 +1,7 @@
 .about-box {
     width: 100%;
     min-height: 800px;
-    background: red;
+    background: transparent;
     display: flex;
 }
 
@@ -65,6 +65,30 @@
     font-family: 'Bold', sans-serif;
     font-size: 30px;
     margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.like-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    padding: 5px;
+    transition: transform 0.2s ease;
+}
+
+.like-button > i {
+    font-size: 24px;
+}
+
+.like-button:hover {
+    transform: scale(1.1);
+}
+
+.like-button.liked i {
+    color: #ff6b6b;
 }
 
 .address {

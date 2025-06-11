@@ -100,8 +100,8 @@ const CardLayout = ({ onCardClick }) => {
     <div key={index} onClick={() => handleCardClick(card)} style={{ cursor: 'pointer' }}>
       <div className="overlay">
         <ul>
-          <li>{card.placeName}</li>
           <li>{card.address}</li>
+          <li>{card.placeName}</li>
         </ul>
         <span><i className="fa-solid fa-location-arrow"></i></span>
       </div>

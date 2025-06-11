@@ -8,8 +8,8 @@
 
 .logo {
     cursor: pointer;
-    width: 50px;
-    height: 20px;
+    width: 35px;
+    height: 35px;
 }
 
 .login-btn {
@@ -20,6 +20,12 @@
 }
 
 .mypage-btn {
+    background: transparent;
+    border: none;
+    margin-right: 30px;
+}
+
+.dibs-btn {
     background: transparent;
     border: none;
 }

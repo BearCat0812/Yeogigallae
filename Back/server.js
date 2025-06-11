@@ -204,7 +204,7 @@ function parseKoreanDate(dateStr) {
 async function getReviews(placeId) {
     try {
         const reviews = await executeQuery(
-            `SELECT c.title, c.detail, c.date, c.name as userName 
+            `SELECT c.num, c.users_num, c.title, c.detail, c.date, c.name as userName 
              FROM comment c 
              WHERE c.database_id = ? 
              ORDER BY c.date DESC`,
@@ -405,8 +405,11 @@ app.post('/dibs', async (req, res) => {
 
     if (req.session.userId && check.length == 0) {
         await executeQuery('INSERT INTO dibs(users_num,database_id) VALUES (?,?)', [req.session.userNum, placeId]);
+        res.json({ success: true });
+    } else {
+        res.json({ success: false });
     }
-})
+});
 
 /* 찜 DB 삭제 */
 app.post('/dibs-delete', async (req, res) => {
@@ -415,8 +418,11 @@ app.post('/dibs-delete', async (req, res) => {
 
     if (req.session.userId && check.length > 0) {
         await executeQuery('DELETE FROM dibs WHERE users_num = ? AND database_id = ?', [req.session.userNum, placeId]);
+        res.json({ success: true });
+    } else {
+        res.json({ success: false });
     }
-})
+});
 
 app.get('/dibs/:id', async (req, res) => {
     const data = await executeQuery('SELECT users_num,database_id FROM dibs WHERE users_num = ? AND database_id = ?', [req.session.userNum, req.params.id]);
@@ -445,7 +451,12 @@ app.get('/search', async (req, res) => {
 
 app.get('/session-check', (req, res) => {
     if (req.session.userId) {
-        res.json({ loggedIn: true, id: req.session.userId, name: req.session.userName });
+        res.json({ 
+            loggedIn: true, 
+            id: req.session.userId, 
+            name: req.session.userName,
+            userNum: req.session.userNum 
+        });
     } else {
         res.json({ loggedIn: false });
     }
@@ -548,6 +559,102 @@ app.get('/reviews/:placeId', async (req, res) => {
             success: false,
             message: "서버 오류가 발생했습니다."
         });
+    }
+});
+
+/* 리뷰 삭제 */
+app.delete('/reviews/:placeId/:userId/:reviewId', async (req, res) => {
+    const { placeId, userId, reviewId } = req.params;
+    
+    // 세션 체크
+    if (!req.session.userId) {
+        return res.json({ success: false, message: '로그인이 필요합니다.' });
+    }
+
+    try {
+        // 리뷰 작성자와 현재 로그인한 사용자가 일치하는지 확인
+        const review = await executeQuery(
+            'SELECT * FROM comment WHERE num = ? AND users_num = ? AND database_id = ?', 
+            [reviewId, userId, placeId]
+        );
+        
+        if (review.length === 0) {
+            return res.json({ success: false, message: '삭제할 수 없는 리뷰입니다.' });
+        }
+
+        // 리뷰 삭제
+        await executeQuery(
+            'DELETE FROM comment WHERE num = ? AND users_num = ? AND database_id = ?', 
+            [reviewId, userId, placeId]
+        );
+        
+        res.json({ success: true, message: '리뷰가 삭제되었습니다.' });
+    } catch (error) {
+        console.error('리뷰 삭제 실패:', error);
+        res.json({ success: false, message: '리뷰 삭제 중 오류가 발생했습니다.' });
+    }
+});
+
+/* 회원탈퇴 */
+app.post('/delete-user', async (req, res) => {
+    if (!req.session.userId) {
+        return res.json({ success: false, message: '로그인이 필요합니다.' });
+    }
+
+    try {
+        // 트랜잭션 시작
+        await executeQuery('START TRANSACTION');
+
+        // 1. 사용자의 찜 목록 삭제
+        await executeQuery('DELETE FROM dibs WHERE users_num = ?', [req.session.userNum]);
+
+        // 2. 사용자의 댓글 삭제
+        await executeQuery('DELETE FROM comment WHERE users_num = ?', [req.session.userNum]);
+
+        // 3. 사용자 계정 삭제
+        await executeQuery('DELETE FROM users WHERE num = ?', [req.session.userNum]);
+
+        // 트랜잭션 커밋
+        await executeQuery('COMMIT');
+
+        // 세션 삭제
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('세션 삭제 실패:', err);
+                return res.json({ success: false, message: '회원탈퇴 중 오류가 발생했습니다.' });
+            }
+            res.json({ success: true, message: '회원탈퇴가 완료되었습니다.' });
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await executeQuery('ROLLBACK');
+        console.error('회원탈퇴 실패:', error);
+        res.json({ success: false, message: '회원탈퇴 중 오류가 발생했습니다.' });
+    }
+});
+
+/* 찜 목록 가져오기 */
+app.get('/dibs-list', async (req, res) => {
+    if (!req.session.userId) {
+        console.log('세션 없음');
+        return res.status(401).json({ error: '로그인이 필요합니다.' });
+    }
+
+    try {
+        console.log('찜 목록 조회 시도 - userNum:', req.session.userNum);
+        const dibsList = await executeQuery(
+            `SELECT p.id, p.placeName, p.address, p.imgName
+             FROM \`database\` p 
+             INNER JOIN dibs d ON p.id = d.database_id 
+             WHERE d.users_num = ? 
+             ORDER BY d.num DESC`,
+            [req.session.userNum]
+        );
+        console.log('찜 목록 조회 결과:', dibsList);
+        res.json(dibsList);
+    } catch (error) {
+        console.error('찜 목록 조회 실패:', error);
+        res.status(500).json({ error: '찜 목록을 가져오는데 실패했습니다.' });
     }
 });
 

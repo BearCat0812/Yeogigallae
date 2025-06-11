@@ -1,6 +1,7 @@
 import React from 'react';
 import './Header.css';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Header = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
         <>
           <button className="login-btn" onClick={handleLogout}>로그아웃</button>
           <button className="mypage-btn" onClick={() => navigate('/mypage')}>마이페이지</button>
+          <button className="dibs-btn" onClick={() => navigate('/dibs')}>찜 목록</button>
         </>
       )}
     </div>

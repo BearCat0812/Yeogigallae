@@ -82,9 +82,14 @@ const About = () => {
         },
         credentials: 'include',
         body: JSON.stringify({ placeId: placeData.id }),
-      }).then(res => {
-        if (!res.ok) setClick(!newClickState); // 실패 시 원래 상태로 되돌림
-      });
+      }).then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('찜 목록에 추가되었어요.');
+          } else {
+            setClick(!newClickState); // 실패 시 원래 상태로 되돌림
+          }
+        });
     } else if (click) {
       fetch("http://localhost:8080/dibs-delete", {
         method: 'POST',
@@ -93,9 +98,14 @@ const About = () => {
         },
         credentials: 'include',
         body: JSON.stringify({ placeId: placeData.id }),
-      }).then(res => {
-        if (!res.ok) setClick(!newClickState); // 실패 시 원래 상태로 되돌림
-      });
+      }).then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('찜 목록에서 제거되었어요.');
+          } else {
+            setClick(!newClickState); // 실패 시 원래 상태로 되돌림
+          }
+        });
     }
   };
 
@@ -122,22 +132,18 @@ const About = () => {
         <div className="about-box-right">
           <ul>
             <li className="italic">about</li>
-            <li className="placeName">{placeData.placeName}</li>
-            <li className="address">{placeData.address}</li>
-            <li className="placeEx">
-              {/* 임시 찜 버튼 */}
+            <li className="placeName">
+              {placeData.placeName}
               <button
                 id='dibs'
                 onClick={dibs}
-                style={{
-                  width: '100px',
-                  backgroundColor: click ? 'blue' : 'white',
-                  color: click ? 'white' : 'black',
-                  border: '1px solid #ccc'
-                }}
+                className={`like-button ${click ? 'liked' : ''}`}
               >
-                찜
+                <i className={`fa-${click ? 'solid' : 'regular'} fa-heart`}></i>
               </button>
+            </li>
+            <li className="address">{placeData.address}</li>
+            <li className="placeEx">
               <pre>
                 {placeEx || '상세 설명을 불러오는 중...'}
               </pre>

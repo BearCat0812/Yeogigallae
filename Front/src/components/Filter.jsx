@@ -95,10 +95,29 @@ const Filter = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handlePlace = id =>
+    const handlePlace = id => {
+        if (places.length >= 2 && !places.includes(id)) {
+            alert('이미 장소를 모두 선택하셨어요.');
+            return;
+        }
         setPlaces(prev =>
-            prev.includes(id) ? prev.filter(p => p !== id) : prev.length < 2 ? [...prev, id] : prev
+            prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
         );
+    };
+
+    const handlePlaceClick = (place) => {
+        if (places.length >= 2 && !places.includes(place)) {
+            alert('이미 장소를 모두 선택하셨어요.');
+            return;
+        }
+        setPlaces(prev => {
+            if (prev.includes(place)) {
+                return prev.filter(p => p !== place);
+            } else {
+                return [...prev, place];
+            }
+        });
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();

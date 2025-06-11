@@ -11,6 +11,9 @@
   align-items: center;
 }
 
+.logo-container > span {
+  color: #222;
+}
 
 .home-logo {
     width: 400px;
