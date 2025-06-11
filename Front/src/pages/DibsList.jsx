@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../components/CardLayout.css';
 import { useNavigate } from 'react-router-dom';
+import Banner from '../components/Banner';
 
 const DibsList = () => {
     const [dibsList, setDibsList] = useState([]);
@@ -74,6 +75,7 @@ const DibsList = () => {
 
     return (
         <div>
+            <Banner />
             <div className="section-container container">
                 <p>나만의 특별한 장소들</p>
                 {dibsList.length === 0 ? (
