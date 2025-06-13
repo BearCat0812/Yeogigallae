@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import './About.css'
+import React, { useEffect, useState } from 'react';
+import './About.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CardLayout from '../components/CardLayout.jsx';
 import Review from '../components/Review.jsx';
@@ -12,7 +12,7 @@ const About = () => {
   const [click, setClick] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 로그인 상태 확인
+
   useEffect(() => {
     fetch('http://localhost:8080/session-check', {
       method: 'GET',
@@ -23,7 +23,6 @@ const About = () => {
         setIsLoggedIn(res.loggedIn);
       });
   }, []);
-
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -44,7 +43,6 @@ const About = () => {
     }
   }, [placeData?.id]);
 
-  /* 찜 데이터 호출 */
   useEffect(() => {
     fetch(`http://localhost:8080/dibs/${placeData.id}`, {
       credentials: 'include'
@@ -55,13 +53,58 @@ const About = () => {
       })
   }, [placeData?.id]);
 
+  // Kakao 지도 스크립트 로드 및 지도 생성
+  useEffect(() => {
+    if (!placeData?.address) return;
+
+    console.log('주소:', placeData.address);
+
+    const script = document.createElement('script');
+    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=95722e7d3aa313d7f037366c279c7e2d&autoload=false&libraries=services";
+    script.async = true;
+    script.onload = () => {
+      window.kakao.maps.load(() => {
+        const container = document.getElementById('map');
+        const options = {
+          center: new window.kakao.maps.LatLng(0, 0), // 임시 중심 좌표
+          level: 3
+        };
+        const map = new window.kakao.maps.Map(container, options);
+
+        const geocoder = new window.kakao.maps.services.Geocoder();
+
+        // placeData.address를 바로 사용
+        geocoder.addressSearch(placeData.address, function (result, status) {
+          if (status === window.kakao.maps.services.Status.OK) {
+            const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+
+            // 지도 중심을 검색된 좌표로 이동
+            map.setCenter(coords);
+
+            // 마커 생성
+            const marker = new window.kakao.maps.Marker({
+              map: map,
+              position: coords
+            });
+          } else {
+            alert('주소 검색 결과가 없습니다.');
+          }
+        });
+      });
+    };
+    document.head.appendChild(script);
+
+    // 클린업: 스크립트 제거
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [placeData?.address]);
 
   if (!placeData) {
     navigate('/');
     return null;
   }
 
-  /* 찜 눌리면 작동 */
   const dibs = (e) => {
     e.preventDefault();
 
@@ -72,7 +115,7 @@ const About = () => {
     }
 
     const newClickState = !click;
-    setClick(newClickState); // 즉시 상태 업데이트
+    setClick(newClickState);
 
     if (!click) {
       fetch("http://localhost:8080/dibs", {
@@ -87,10 +130,10 @@ const About = () => {
           if (data.success) {
             alert('찜 목록에 추가되었어요.');
           } else {
-            setClick(!newClickState); // 실패 시 원래 상태로 되돌림
+            setClick(!newClickState);
           }
         });
-    } else if (click) {
+    } else {
       fetch("http://localhost:8080/dibs-delete", {
         method: 'POST',
         headers: {
@@ -103,12 +146,11 @@ const About = () => {
           if (data.success) {
             alert('찜 목록에서 제거되었어요.');
           } else {
-            setClick(!newClickState); // 실패 시 원래 상태로 되돌림
+            setClick(!newClickState);
           }
         });
     }
   };
-
 
   const handleCardClick = (card) => {
     navigate('/about', {
@@ -148,6 +190,7 @@ const About = () => {
                 {placeEx || '상세 설명을 불러오는 중...'}
               </pre>
             </li>
+            <div id="map"></div>
           </ul>
         </div>
       </div>
@@ -157,4 +200,4 @@ const About = () => {
   )
 }
 
-export default About
+export default About;
