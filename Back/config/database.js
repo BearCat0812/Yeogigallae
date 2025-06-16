@@ -1,9 +1,9 @@
 const mariadb = require('mariadb');
 
 const pool = mariadb.createPool({
-    host: "127.0.0.1",
-    user: "root",
-    password: "root",
+    host: "192.168.0.191",
+    user: "1team",
+    password: "1team",
     database: "1team",
     port: "3306"
 });

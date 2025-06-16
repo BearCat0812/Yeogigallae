@@ -6,6 +6,13 @@ import { Link } from 'react-router-dom';
 const Header = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
 
+  const reset = () => {
+    sessionStorage.removeItem('datePreferences');
+    sessionStorage.removeItem('searchResults');
+    navigate('/');
+    window.location.reload();
+  }
+
   const handleLogout = () => {
     fetch('http://localhost:8080/logout', {
       method: 'POST',
@@ -26,7 +33,7 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
 
   return (
     <div className="header-container">
-      <img src="/images/logoS.png" alt="logo" onClick={() => navigate('/')} className="logo" />
+      <img src="/images/logoS.png" alt="logo" onClick={reset} className="logo" />
       {!isLoggedIn ? (
         <button className="login-btn" onClick={() => navigate('/login')}>로그인/회원가입</button>
       ) : (
