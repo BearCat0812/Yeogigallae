@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/logoIcon.png" />
     <title>여기갈래 발표자료</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         :root {
             --slide-width: 1280px;
             --slide-height: 720px;
-            --transition-duration: 0.3s;
+            --transition-duration: 0.5s;
             --drag-threshold: 50px;
             --thumbnail-width: 240px;
             --thumbnail-height: 135px;
@@ -39,7 +40,7 @@
             gap: 20px;
             align-items: center;
             position: relative;
-            transition: transform var(--transition-duration) ease;
+            transition: transform var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
             will-change: transform;
         }
 
@@ -92,10 +93,9 @@
         }
 
         .thumbnail-panel {
-            width: var(--thumbnail-width);
+            width: var(--thumbnail-width + 20px);
             height: var(--slide-height);
             background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
             padding: 10px;
             box-sizing: border-box;
             overflow-y: auto;
@@ -104,15 +104,19 @@
             flex-direction: column;
             gap: 15px;
             position: absolute;
-            right: -270px;
-            transition: transform var(--transition-duration) ease;
+            right: -100vw;
+            transition: transform var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateX(0);
             z-index: 10;
             will-change: transform;
         }
 
         .thumbnail-panel.hidden {
-            transform: translateX(270px);
+            transform: translateX(0);
+        }
+
+        .thumbnail-panel:not(.hidden) {
+            transform: translateX(calc(-100vw + 300px));
         }
 
         .toggle-thumbnails {
@@ -152,6 +156,7 @@
             height: var(--thumbnail-height);
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             border-radius: 4px;
             cursor: pointer;
             transition: transform 0.2s ease;
@@ -244,9 +249,6 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            position: relative;
-            width: fit-content;
-            will-change: transform;
         }
 
         .folder-name:hover {
@@ -263,6 +265,9 @@
             color: #333;
             padding-bottom: 15px;
             border-bottom: 2px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .description-content {
@@ -393,6 +398,256 @@
         .fa-folder {
             color: #ffd700;
         }
+
+        /* ERD Modal Styles */
+        .erd-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .erd-modal.show {
+            display: flex;
+        }
+
+        .erd-modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            position: relative;
+            max-width: 80%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .close-erd-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close-erd-modal:hover {
+            color: #666;
+        }
+
+        @media (max-width: 1200px) {
+            .erd-table-wrapper {
+                width: 100%;
+            }
+        }
+
+        /* ERD 테이블 스타일 */
+        .erd-container {
+            display: grid; /* Flexbox 대신 Grid 사용 */
+            grid-template-columns: repeat(2, 1fr); /* 2열 */
+            grid-template-rows: repeat(2, 1fr); /* 2행 */
+            gap: 30px; /* 테이블 간 간격 늘림 */
+            justify-items: center; /* 그리드 아이템 중앙 정렬 */
+            align-items: center; /* 그리드 아이템 중앙 정렬 */
+            padding: 30px;
+            padding-top: 120px;
+            width: 50%;
+            max-height: 100%;
+            overflow: hidden; /* 스크롤 가능 */
+            box-sizing: border-box; /* 패딩 포함 크기 계산 */
+        }
+        .erd-table-box {
+            background-color: white;
+            border-radius: 5px;
+            min-width: 200px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+            overflow: hidden;
+            cursor: pointer; /* 클릭 가능 표시 */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .erd-table-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .erd-table-name {
+            color: white;
+            padding: 8px 10px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .erd-table-name.users { background-color: #4CAF50; } /* Green */
+        .erd-table-name.comment { background-color: #FFB74D; } /* Red */
+        .erd-table-name.dibs { background-color: #E57373; } /* Orange */
+        .erd-table-name.database { background-color: #64B5F6; } /* Blue */
+
+        .erd-table-columns {
+            padding: 10px;
+        }
+        .erd-column {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            color: #333;
+        }
+        .erd-column:last-child {
+            border-bottom: none;
+        }
+        .erd-column-name {
+            flex-grow: 1;
+            font-weight: 500;
+        }
+        .erd-column-type {
+            font-style: italic;
+            color: #666;
+            margin-left: 10px;
+        }
+        .erd-column-constraint {
+            font-size: 12px;
+            color: #999;
+            margin-left: 5px;
+        }
+        .erd-key-badge {
+            display: inline-block;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            padding: 2px 5px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-right: 5px;
+            color: #555;
+        }
+        .erd-key-badge.pk {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .erd-key-badge.fk {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        /* SVG 관계선 스타일 */
+        .erd-relationships-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* SVG 클릭 시 하단 요소 클릭 방지 */
+            z-index: 1; /* 테이블 위에 그려지도록 설정 */
+        }
+
+        .erd-relationship-line {
+            stroke: #666;
+            stroke-width: 2;
+            stroke-dasharray: 5,5; /* 점선 */
+            fill: none;
+        }
+
+        /* 상세설명 버튼 스타일 */
+        .detail-btn {
+            padding: 5px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .detail-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* 상세설명 모달 스타일 */
+        .detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .detail-modal.show {
+            display: flex;
+        }
+
+        .detail-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 1200px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .detail-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .detail-modal-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        .close-detail-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .detail-images-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .detail-image {
+            width: 45%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .detail-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -412,8 +667,14 @@
         </div>
     </div>
 
+    <div class="erd-modal">
+        <div class="erd-modal-content">
+            <button class="close-erd-modal">&times;</button>
+            <div id="erd-content"></div>
+        </div>
+    </div>
+
     <script>
-        // 슬라이드 이미지 목록
         const SLIDE_IMAGES = [
             'images/title.png',
             'images/contents.png',
@@ -430,13 +691,18 @@
             'images/contents4.png',
             'images/contents4-2.png',
             'images/contents4-3.png',
-            'images/contents5.png',
-            'images/contents5-2.png',
-            'images/contents6.png',
+            'images/contents5.png', //프로잭트 소개
+            'images/contents5-2.png', //ERD 이미지
+            'images/contents5-3.png', //ERD 설명
+            'images/contents5-4.png', //폴더 및 페이지 별 기능
+            'images/contents6.png', //시연 영상
             'images/contents6-2.png',
-            'images/contents7.png',
+            'images/contents7.png', //프로젝트를 마치며
             'images/contents7-2.png',
-            'images/contents8.png',
+            'images/contents7-3.png',
+            'images/contents7-4.png',
+            'images/contents7-5.png',
+            'images/end.png'
         ];
 
         // 이미지 프리로드
@@ -461,6 +727,70 @@
                 this.thumbnails = [];
                 this.mainContainer = document.querySelector('.main-container');
 
+                // ERD 데이터 정의
+                this.ERD_TABLES = [
+                    {
+                        koreanName: "사용자",
+                        englishName: "users",
+                        description: "사용자의 기본 정보를 저장하는 테이블입니다. 회원가입 및 로그인 기능을 관리합니다.",
+                        columns: [
+                            { name: "num", type: "INT", constraint: "NOT NULL", isPK: true },
+                            { name: "name", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "email", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "id", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "pw", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "tel", type: "TEXT", constraint: "NOT NULL" }
+                        ]
+                    },
+                    {
+                        koreanName: "찜",
+                        englishName: "dibs",
+                        description: "사용자들이 찜한 장소 정보를 저장하는 테이블입니다. 사용자와 장소 간의 관계를 나타냅니다.",
+                        columns: [
+                            { name: "num", type: "INT", constraint: "NOT NULL", isPK: true },
+                            { name: "users_num", type: "INT", constraint: "NOT NULL", isFK: true },
+                            { name: "database_id", type: "INT", constraint: "NOT NULL", isFK: true }
+                        ]
+                    },
+                    {
+                        koreanName: "게시글",
+                        englishName: "comment",
+                        description: "사용자들이 작성한 게시글 정보를 저장하는 테이블입니다. 게시글의 내용과 작성자 정보, 관련 장소 정보를 포함합니다.",
+                        columns: [
+                            { name: "num", type: "INT", constraint: "NOT NULL", isPK: true },
+                            { name: "users_num", type: "INT", constraint: "NOT NULL", isFK: true },
+                            { name: "database_id", type: "INT", constraint: "NOT NULL", isFK: true },
+                            { name: "name", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "title", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "detail", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "date", type: "TEXT", constraint: "NOT NULL" }
+                        ]
+                    },
+                    {
+                        koreanName: "장소",
+                        englishName: "database",
+                        description: "다양한 장소 정보를 저장하는 테이블입니다. 이미지, 위치, 설명 등 장소의 상세 정보를 담고 있습니다.",
+                        columns: [
+                            { name: "id", type: "INT", constraint: "NOT NULL", isPK: true },
+                            { name: "imgName", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "region", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "placeName", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "address", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "dataType", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "place", type: "TEXT", constraint: "NOT NULL" },
+                            { name: "placeEx", type: "TEXT", constraint: "NOT NULL" }
+                        ]
+                    }
+                ];
+
+                // ERD 관계 정의 (클래스 멤버로 이동)
+                this.ERD_RELATIONSHIPS = [
+                    { source: "users", target: "comment", type: "one-to-many" },
+                    { source: "users", target: "dibs", type: "one-to-many" },
+                    { source: "database", target: "comment", type: "one-to-many" },
+                    { source: "database", target: "dibs", type: "one-to-many" }
+                ];
+
                 this.init();
             }
 
@@ -474,34 +804,32 @@
 
             async createSlides() {
                 const fragment = document.createDocumentFragment();
-                
+
                 for (let i = 0; i < SLIDE_IMAGES.length; i++) {
                     const slide = document.createElement('div');
                     slide.className = i === 0 ? 'slide active' : 'slide next';
                     slide.style.backgroundImage = `url('${SLIDE_IMAGES[i]}')`;
-                    
+
                     // contents5-2.png 슬라이드에 폴더 구조 추가
-                    if (SLIDE_IMAGES[i] === 'images/contents5-2.png') {
+                    if (SLIDE_IMAGES[i] === 'images/contents5-4.png') {
                         const folderStructure = document.createElement('div');
                         folderStructure.className = 'folder-structure';
 
                         const descriptionContainer = document.createElement('div');
                         descriptionContainer.className = 'folder-description';
                         descriptionContainer.innerHTML = `
-                            <div class="description-title">폴더 설명</div>
-                            <div class="description-content">폴더를 클릭하면 설명이 여기에 표시됩니다.</div>
+                            <div class="description-title">설명</div>
+                            <div class="description-content">폴더나 테이블을 클릭하면 설명이 여기에 표시됩니다.</div>
                         `;
                         slide.appendChild(descriptionContainer);
-                        
+
                         const structure = {
                             "name": "Date_App",
                             "type": "folder",
-                            "description": "여기갈래 프로젝트의 루트 폴더입니다.",
                             "children": [
                                 {
                                     "name": "Front",
                                     "type": "folder",
-                                    "description": "프론트엔드 관련 파일들이 위치한 폴더입니다.",
                                     "children": [
                                         {
                                             "name": "src",
@@ -761,9 +1089,104 @@
                                     "description": "백엔드 관련 파일들이 위치한 폴더입니다.",
                                     "children": [
                                         {
-                                            "name": "node_modules",
+                                            "name": "routes",
                                             "type": "folder",
-                                            "description": "Node.js 패키지들이 설치된 폴더입니다."
+                                            "description": "API 라우트들이 정의된 폴더입니다.",
+                                            "children": [
+                                                {
+                                                    "name": "userRoutes.js",
+                                                    "type": "file",
+                                                    "description": "사용자 관련 API 라우트를 정의한 파일입니다."
+                                                },
+                                                {
+                                                    "name": "placeRoutes.js",
+                                                    "type": "file",
+                                                    "description": "장소 관련 API 라우트를 정의한 파일입니다."
+                                                },
+                                                {
+                                                    "name": "reviewRoutes.js",
+                                                    "type": "file",
+                                                    "description": "리뷰 관련 API 라우트를 정의한 파일입니다."
+                                                },
+                                                {
+                                                    "name": "dibsRoutes.js",
+                                                    "type": "file",
+                                                    "description": "찜하기 관련 API 라우트를 정의한 파일입니다."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "models",
+                                            "type": "folder",
+                                            "description": "데이터베이스 모델들이 정의된 폴더입니다.",
+                                            "children": [
+                                                {
+                                                    "name": "userModel.js",
+                                                    "type": "file",
+                                                    "description": "사용자 데이터베이스 모델을 정의한 파일입니다."
+                                                },
+                                                {
+                                                    "name": "placeModel.js",
+                                                    "type": "file",
+                                                    "description": "장소 데이터베이스 모델을 정의한 파일입니다."
+                                                },
+                                                {
+                                                    "name": "reviewModel.js",
+                                                    "type": "file",
+                                                    "description": "리뷰 데이터베이스 모델을 정의한 파일입니다."
+                                                },
+                                                {
+                                                    "name": "dibsModel.js",
+                                                    "type": "file",
+                                                    "description": "찜하기 데이터베이스 모델을 정의한 파일입니다."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "config",
+                                            "type": "folder",
+                                            "description": "설정 파일들이 위치한 폴더입니다.",
+                                            "children": [
+                                                {
+                                                    "name": "database.js",
+                                                    "type": "file",
+                                                    "description": "데이터베이스 연결 설정을 정의한 파일입니다."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "utils",
+                                            "type": "folder",
+                                            "description": "유틸리티 함수들이 위치한 폴더입니다.",
+                                            "children": [
+                                                {
+                                                    "name": "validators.js",
+                                                    "type": "file",
+                                                    "description": "입력값 검증을 위한 유틸리티 함수들이 정의된 파일입니다."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "nbproject",
+                                            "type": "folder",
+                                            "description": "NetBeans 프로젝트 설정 파일들이 위치한 폴더입니다.",
+                                            "children": [
+                                                {
+                                                    "name": "project.xml",
+                                                    "type": "file",
+                                                    "description": "NetBeans 프로젝트의 XML 설정 파일입니다."
+                                                },
+                                                {
+                                                    "name": "project.properties",
+                                                    "type": "file",
+                                                    "description": "NetBeans 프로젝트의 속성 설정 파일입니다."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "app.js",
+                                            "type": "file",
+                                            "description": "Express 애플리케이션 설정 파일입니다."
                                         },
                                         {
                                             "name": "server.js",
@@ -774,6 +1197,11 @@
                                             "name": "package.json",
                                             "type": "file",
                                             "description": "백엔드 프로젝트의 의존성과 스크립트를 정의한 파일입니다."
+                                        },
+                                        {
+                                            "name": "package-lock.json",
+                                            "type": "file",
+                                            "description": "npm 패키지의 정확한 버전 정보를 담고 있는 파일입니다."
                                         }
                                     ]
                                 },
@@ -801,7 +1229,7 @@
                                 </div>
                             `;
                         }
-                        
+
                         folderStructure.innerHTML = createFolderHTML(structure);
                         slide.appendChild(folderStructure);
 
@@ -812,28 +1240,161 @@
 
                         const folders = folderStructure.querySelectorAll('.folder');
                         const descriptionContent = descriptionContainer.querySelector('.description-content');
-                        
+
                         folders.forEach(folder => {
                             const folderName = folder.querySelector('.folder-name');
                             folderName.addEventListener('click', (e) => {
                                 e.stopPropagation();
-                                
+
                                 folders.forEach(f => f.querySelector('.folder-name').classList.remove('active'));
                                 folderName.classList.add('active');
-                                
+
                                 descriptionContent.textContent = folder.dataset.description || '설명이 없습니다.';
-                                
+
                                 const content = folder.querySelector('.folder-content');
                                 if (content) {
                                     folder.classList.toggle('open');
                                     content.classList.toggle('show');
                                 }
+
+                                // 상세설명 버튼 추가
+                                const descriptionTitle = descriptionContainer.querySelector('.description-title');
+                                const fileName = folderName.textContent.trim();
+                                
+                                if (fileDetails[fileName]) {
+                                    descriptionTitle.innerHTML = `
+                                        <span>테이블 설명</span>
+                                        <button class="detail-btn">상세설명</button>
+                                    `;
+                                } else {
+                                    descriptionTitle.innerHTML = `
+                                        <span>테이블 설명</span>
+                                    `;
+                                }
                             });
                         });
                     }
 
+                    // contents5-3.png 슬라이드에 ERD 테이블 추가
+                    if (SLIDE_IMAGES[i] === 'images/contents5-3.png') {
+                        const descriptionContainer = document.createElement('div');
+                        descriptionContainer.className = 'folder-description';
+                        descriptionContainer.innerHTML = `
+                            <div class="description-title">테이블 설명</div>
+                            <div class="description-content">테이블을 클릭하면 설명이 여기에 표시됩니다.</div>
+                        `;
+                        slide.appendChild(descriptionContainer);
+
+                        const erdContainer = document.createElement('div');
+                        erdContainer.className = 'erd-container';
+
+                        this.ERD_TABLES.forEach(table => {
+                            const tableBox = document.createElement('div');
+                            tableBox.className = 'erd-table-box';
+                            tableBox.dataset.tableName = table.englishName; // 테이블 이름을 데이터 속성으로 저장
+                            tableBox.dataset.description = table.description;
+
+                            const tableName = document.createElement('div');
+                            tableName.className = `erd-table-name ${table.englishName}`;
+                            tableName.innerHTML = `${table.koreanName} (${table.englishName})`;
+                            tableBox.appendChild(tableName);
+
+                            const columnsContainer = document.createElement('div');
+                            columnsContainer.className = 'erd-table-columns';
+
+                            table.columns.forEach(column => {
+                                const columnDiv = document.createElement('div');
+                                columnDiv.className = 'erd-column';
+                                let keyBadge = '';
+                                if (column.isPK) {
+                                    keyBadge = '<span class="erd-key-badge pk">PK</span>';
+                                } else if (column.isFK) {
+                                    keyBadge = '<span class="erd-key-badge fk">FK</span>';
+                                }
+                                columnDiv.innerHTML = `
+                                    ${keyBadge}
+                                    <span class="erd-column-name">${column.name}</span>
+                                    <span class="erd-column-type">${column.type}</span>
+                                    <span class="erd-column-constraint">${column.constraint}</span>
+                                `;
+                                columnsContainer.appendChild(columnDiv);
+                            });
+                            tableBox.appendChild(columnsContainer);
+                            erdContainer.appendChild(tableBox);
+
+                            tableBox.addEventListener('click', () => {
+                                // 모든 테이블의 active 클래스 제거
+                                erdContainer.querySelectorAll('.erd-table-box').forEach(box => {
+                                    box.classList.remove('active');
+                                });
+                                // 클릭된 테이블에 active 클래스 추가
+                                tableBox.classList.add('active');
+                                descriptionContainer.querySelector('.description-content').textContent = tableBox.dataset.description;
+                            });
+                        });
+
+                        slide.appendChild(erdContainer);
+
+                        // SVG 관계선 컨테이너 추가
+                        const erdSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                        erdSVG.setAttribute("class", "erd-relationships-svg");
+                        erdSVG.setAttribute("width", "100%");
+                        erdSVG.setAttribute("height", "100%");
+
+                        // 마커 정의
+                        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+
+                        // 1:N 관계 (까마귀 발)
+                        const manyMarker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+                        manyMarker.setAttribute("id", "arrowMany");
+                        manyMarker.setAttribute("viewBox", "0 0 10 10");
+                        manyMarker.setAttribute("refX", "9");
+                        manyMarker.setAttribute("refY", "5");
+                        manyMarker.setAttribute("markerUnits", "strokeWidth");
+                        manyMarker.setAttribute("markerWidth", "6");
+                        manyMarker.setAttribute("markerHeight", "6");
+                        manyMarker.setAttribute("orient", "auto");
+                        const pathMany = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        pathMany.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+                        pathMany.setAttribute("fill", "#666");
+                        manyMarker.appendChild(pathMany);
+                        defs.appendChild(manyMarker);
+
+                        // 1:1 관계 (원)
+                        const oneMarker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+                        oneMarker.setAttribute("id", "circleOne");
+                        oneMarker.setAttribute("viewBox", "0 0 10 10");
+                        oneMarker.setAttribute("refX", "5");
+                        oneMarker.setAttribute("refY", "5");
+                        oneMarker.setAttribute("markerUnits", "strokeWidth");
+                        oneMarker.setAttribute("markerWidth", "4");
+                        oneMarker.setAttribute("markerHeight", "4");
+                        oneMarker.setAttribute("orient", "auto");
+                        const circleOne = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        circleOne.setAttribute("cx", "5");
+                        circleOne.setAttribute("cy", "5");
+                        circleOne.setAttribute("r", "3");
+                        circleOne.setAttribute("stroke", "#666");
+                        circleOne.setAttribute("fill", "white");
+                        oneMarker.appendChild(circleOne);
+                        defs.appendChild(oneMarker);
+
+                        erdSVG.appendChild(defs);
+                        slide.appendChild(erdSVG); // SVG를 슬라이드에 추가
+
+                        // 테이블이 렌더링된 후 관계선을 그립니다.
+                        setTimeout(() => {
+                            this.drawERDRelationships(erdSVG, erdContainer);
+                        }, 100); // 짧은 지연을 주어 테이블 렌더링을 기다립니다.
+
+                        // ERD 컨테이너의 스크롤 이벤트가 슬라이드에 전파되지 않도록 처리
+                        erdContainer.addEventListener('wheel', (e) => {
+                            e.stopPropagation();
+                        }, { passive: true });
+                    }
+
                     // contents7-2.png 슬라이드에 demo.mp4 영상 추가
-                    if (SLIDE_IMAGES[i] === 'images/contents7-2.png') {
+                    if (SLIDE_IMAGES[i] === 'images/contents6-2.png') {
                         const videoContainer = document.createElement('div');
                         videoContainer.style.width = 'calc(100% - 60px)';
                         videoContainer.style.height = 'calc(100% - 180px)';
@@ -858,15 +1419,108 @@
                         slide.appendChild(videoContainer);
                     }
 
+                    // contents7-4.png 슬라이드에 카드 레이아웃 추가
+                    if (SLIDE_IMAGES[i] === 'images/contents7-4.png') {
+                        const cardsContainer = document.createElement('div');
+                        cardsContainer.style.cssText = `
+                            display: flex;
+                            justify-content: center;
+                            gap: 30px;
+                            padding: 140px 50px 50px 50px;
+                            height: 100%;
+                            box-sizing: border-box;
+                        `;
+
+                        const cards = [
+                            {
+                                title: '운영진이 직접 제공하는 신뢰 가능한 정보',
+                                description: '전문가들이 직접 검증하고 선별한 데이트 장소 정보를 제공합니다.',
+                                icon: 'fa-check-circle',
+                                color: '#4CAF50'
+                            },
+                            {
+                                title: '원하는 테마의 데이트장소 추천',
+                                description: '다양한 테마와 상황에 맞는 맞춤형 데이트 장소를 추천해드립니다.',
+                                icon: 'fa-heart',
+                                color: '#E91E63'
+                            },
+                            {
+                                title: '이용자들의 솔직한 리뷰',
+                                description: '실제 이용자들의 생생한 후기와 평가를 확인할 수 있습니다.',
+                                icon: 'fa-comments',
+                                color: '#2196F3'
+                            }
+                        ];
+
+                        cards.forEach(card => {
+                            const cardElement = document.createElement('div');
+                            cardElement.style.cssText = `
+                                background: white;
+                                border-radius: 15px;
+                                padding: 30px;
+                                width: 300px;
+                                box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                text-align: center;
+                                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                            `;
+
+                            const icon = document.createElement('i');
+                            icon.className = `fas ${card.icon}`;
+                            icon.style.cssText = `
+                                font-size: 48px;
+                                color: ${card.color};
+                                margin-bottom: 20px;
+                            `;
+
+                            const title = document.createElement('h3');
+                            title.textContent = card.title;
+                            title.style.cssText = `
+                                font-size: 20px;
+                                color: #333;
+                                margin-bottom: 15px;
+                                font-weight: bold;
+                            `;
+
+                            const description = document.createElement('p');
+                            description.textContent = card.description;
+                            description.style.cssText = `
+                                font-size: 16px;
+                                color: #666;
+                                line-height: 1.5;
+                            `;
+
+                            cardElement.appendChild(icon);
+                            cardElement.appendChild(title);
+                            cardElement.appendChild(description);
+
+                            // 호버 효과
+                            cardElement.addEventListener('mouseover', () => {
+                                cardElement.style.transform = 'translateY(-10px)';
+                                cardElement.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+                            });
+
+                            cardElement.addEventListener('mouseout', () => {
+                                cardElement.style.transform = 'translateY(0)';
+                                cardElement.style.boxShadow = 'rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px';
+                            });
+
+                            cardsContainer.appendChild(cardElement);
+                        });
+
+                        slide.appendChild(cardsContainer);
+                    }
+
                     fragment.appendChild(slide);
                 }
-
                 this.container.appendChild(fragment);
             }
 
             createThumbnails() {
                 const fragment = document.createDocumentFragment();
-                
+
                 SLIDE_IMAGES.forEach((image, index) => {
                     const thumbnail = document.createElement('div');
                     thumbnail.className = `thumbnail${index === 0 ? ' active' : ''}`;
@@ -953,7 +1607,7 @@
                 this.lastScrollTime = now;
 
                 if (this.isScrolling) return;
-                
+
                 this.isScrolling = true;
                 clearTimeout(this.scrollTimeout);
 
@@ -962,7 +1616,7 @@
                 } else if (e.deltaY < 0 && this.currentSlide > 0) {
                     this.currentSlide--;
                 }
-                
+
                 this.updateSlideClasses();
 
                 this.scrollTimeout = setTimeout(() => {
@@ -977,10 +1631,10 @@
 
             handleDragMove(e) {
                 if (!this.isDragging) return;
-                
+
                 const currentPosition = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
                 const diff = currentPosition - this.startY;
-                
+
                 if (Math.abs(diff) > 50) {
                     if (diff > 0 && this.currentSlide > 0) {
                         this.currentSlide--;
@@ -995,6 +1649,148 @@
             handleDragEnd() {
                 this.isDragging = false;
             }
+
+            // 두 사각형 중심을 잇는 선과 사각형 경계의 교차점 계산 함수
+            // 이 함수는 선분 (x1, y1) - (x2, y2)와 사각형 rect의 교차점을 반환합니다.
+            getLineRectangleIntersection(rect, x1, y1, x2, y2) {
+                const points = [];
+                const lines = [
+                    // Top
+                    { x1: rect.left, y1: rect.top, x2: rect.right, y2: rect.top },
+                    // Bottom
+                    { x1: rect.left, y1: rect.bottom, x2: rect.right, y2: rect.bottom },
+                    // Left
+                    { x1: rect.left, y1: rect.top, x2: rect.left, y2: rect.bottom },
+                    // Right
+                    { x1: rect.right, y1: rect.top, x2: rect.right, y2: rect.bottom }
+                ];
+
+                for (const line of lines) {
+                    const den = (line.x1 - line.x2) * (y1 - y2) - (line.y1 - line.y2) * (x1 - x2);
+                    if (den === 0) continue; // Lines are parallel
+
+                    const t = ((line.x1 - x1) * (y1 - y2) - (line.y1 - y1) * (x1 - x2)) / den;
+                    const u = -((line.x1 - line.x2) * (line.y1 - y1) - (line.y1 - line.y2) * (line.x1 - x1)) / den;
+
+                    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+                        const px = line.x1 + t * (line.x2 - line.x1);
+                        const py = line.y1 + t * (line.y2 - line.y1);
+                        points.push({ x: px, y: py });
+                    }
+                }
+
+                if (points.length === 0) {
+                    // No intersection, return the center for fallback
+                    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                }
+
+                // Return the point closest to (x2, y2)
+                if (points.length === 1) {
+                    return points[0];
+                } else {
+                    let closestPoint = points[0];
+                    let minDist = Math.hypot(points[0].x - x2, points[0].y - y2);
+                    for (let i = 1; i < points.length; i++) {
+                        const dist = Math.hypot(points[i].x - x2, points[i].y - y2);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            closestPoint = points[i];
+                        }
+                    }
+                    return closestPoint;
+                }
+            }
+
+            // 관계선을 그리는 함수
+            drawERDRelationships(svgElement, erdContainer) {
+                const relationships = this.ERD_RELATIONSHIPS; // 클래스 멤버 변수
+                const erdContainerRect = erdContainer.getBoundingClientRect();
+
+                // 기존 선 제거 (재그릴 때 필요)
+                svgElement.innerHTML = ''; // Clear existing lines and markers before redrawing
+                const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+
+                // 1:N 관계 (까마귀 발)
+                const manyMarker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+                manyMarker.setAttribute("id", "arrowMany");
+                manyMarker.setAttribute("viewBox", "0 0 10 10");
+                manyMarker.setAttribute("refX", "9");
+                manyMarker.setAttribute("refY", "5");
+                manyMarker.setAttribute("markerUnits", "strokeWidth");
+                manyMarker.setAttribute("markerWidth", "6");
+                manyMarker.setAttribute("markerHeight", "6");
+                manyMarker.setAttribute("orient", "auto");
+                const pathMany = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathMany.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+                pathMany.setAttribute("fill", "#666");
+                manyMarker.appendChild(pathMany);
+                defs.appendChild(manyMarker);
+
+                // 1:1 관계 (원)
+                const oneMarker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+                oneMarker.setAttribute("id", "circleOne");
+                oneMarker.setAttribute("viewBox", "0 0 10 10");
+                oneMarker.setAttribute("refX", "5");
+                oneMarker.setAttribute("refY", "5");
+                oneMarker.setAttribute("markerUnits", "strokeWidth");
+                oneMarker.setAttribute("markerWidth", "4");
+                oneMarker.setAttribute("markerHeight", "4");
+                oneMarker.setAttribute("orient", "auto");
+                const circleOne = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circleOne.setAttribute("cx", "5");
+                circleOne.setAttribute("cy", "5");
+                circleOne.setAttribute("r", "3");
+                circleOne.setAttribute("stroke", "#666");
+                circleOne.setAttribute("fill", "white");
+                oneMarker.appendChild(circleOne);
+                defs.appendChild(oneMarker);
+
+                svgElement.appendChild(defs);
+
+                relationships.forEach(rel => {
+                    const sourceTableElement = erdContainer.querySelector(`[data-table-name="${rel.source}"]`);
+                    const targetTableElement = erdContainer.querySelector(`[data-table-name="${rel.target}"]`);
+
+                    if (sourceTableElement && targetTableElement) {
+                        const sourceRect = sourceTableElement.getBoundingClientRect();
+                        const targetRect = targetTableElement.getBoundingClientRect();
+
+                        // 테이블 중심점 (SVG 컨테이너 기준)
+                        const sourceCenterX = sourceRect.left + sourceRect.width / 2 - erdContainerRect.left;
+                        const sourceCenterY = sourceRect.top + sourceRect.height / 2 - erdContainerRect.top;
+                        const targetCenterX = targetRect.left + targetRect.width / 2 - erdContainerRect.left;
+                        const targetCenterY = targetRect.top + targetRect.height / 2 - erdContainerRect.top;
+
+                        // 선의 시작점과 끝점을 테이블 윤곽선으로 조정
+                        const startPoint = this.getLineRectangleIntersection(
+                            { left: sourceRect.left - erdContainerRect.left, top: sourceRect.top - erdContainerRect.top, right: sourceRect.right - erdContainerRect.left, bottom: sourceRect.bottom - erdContainerRect.top, width: sourceRect.width, height: sourceRect.height },
+                            sourceCenterX, sourceCenterY, targetCenterX, targetCenterY
+                        );
+
+                        const endPoint = this.getLineRectangleIntersection(
+                            { left: targetRect.left - erdContainerRect.left, top: targetRect.top - erdContainerRect.top, right: targetRect.right - erdContainerRect.left, bottom: targetRect.bottom - erdContainerRect.top, width: targetRect.width, height: targetRect.height },
+                            targetCenterX, targetCenterY, sourceCenterX, sourceCenterY // Target to Source for correct intersection
+                        );
+
+
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        line.setAttribute("x1", startPoint.x);
+                        line.setAttribute("y1", startPoint.y);
+                        line.setAttribute("x2", endPoint.x);
+                        line.setAttribute("y2", endPoint.y);
+                        line.setAttribute("class", "erd-relationship-line");
+
+                        // 관계 타입에 따른 마커 설정
+                        if (rel.type === "one-to-many") {
+                            line.setAttribute("marker-end", "url(#arrowMany)");
+                        } else if (rel.type === "one-to-one") {
+                            line.setAttribute("marker-end", "url(#circleOne)");
+                        }
+
+                        svgElement.appendChild(line);
+                    }
+                });
+            }
         }
 
         // 슬라이드 매니저 초기화
@@ -1003,6 +1799,103 @@
         // 페이지 로드 시 실행
         window.addEventListener('load', () => {
             // 폴더 구조는 이미 SlideManager에서 처리되므로 여기서는 아무것도 하지 않음
+        });
+
+        // 상세설명 버튼과 모달 추가
+        const detailModal = document.createElement('div');
+        detailModal.className = 'detail-modal';
+        detailModal.innerHTML = `
+            <div class="detail-modal-content">
+                <div class="detail-modal-header">
+                    <div class="detail-modal-title">상세 설명</div>
+                    <button class="close-detail-modal">&times;</button>
+                </div>
+                <div class="detail-modal-description"></div>
+                <div class="detail-images-container">
+                    <div class="detail-image">
+                        <img src="" alt="상세 이미지 1">
+                    </div>
+                    <div class="detail-image">
+                        <img src="" alt="상세 이미지 2">
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(detailModal);
+
+        // 파일별 상세설명 데이터
+        const fileDetails = {
+            'userRoutes.js': {
+                description: '사용자 관련 API 라우트를 정의한 파일입니다. 회원가입, 로그인, 회원정보 수정, 회원탈퇴 등의 기능을 처리합니다.',
+                images: ['images/userRoutes1.png', 'images/userRoutes2.png']
+            },
+            'placeRoutes.js': {
+                description: '장소 관련 API 라우트를 정의한 파일입니다. 장소 검색, 상세정보 조회, 필터링 등의 기능을 처리합니다.',
+                images: ['images/placeRoutes1.png', 'images/placeRoutes2.png']
+            },
+            'reviewRoutes.js': {
+                description: '리뷰 관련 API 라우트를 정의한 파일입니다. 리뷰 작성, 수정, 삭제, 조회 등의 기능을 처리합니다.',
+                images: ['images/reviewRoutes1.png', 'images/reviewRoutes2.png']
+            },
+            'dibsRoutes.js': {
+                description: '찜하기 관련 API 라우트를 정의한 파일입니다. 장소 찜하기, 찜 목록 조회, 찜 취소 등의 기능을 처리합니다.',
+                images: ['images/dibsRoutes1.png', 'images/dibsRoutes2.png']
+            },
+            'userModel.js': {
+                description: '사용자 데이터베이스 모델을 정의한 파일입니다. 사용자 정보의 구조와 관계를 정의합니다.',
+                images: ['images/userModel1.png', 'images/userModel2.png']
+            },
+            'placeModel.js': {
+                description: '장소 데이터베이스 모델을 정의한 파일입니다. 장소 정보의 구조와 관계를 정의합니다.',
+                images: ['images/placeModel1.png', 'images/placeModel2.png']
+            },
+            'reviewModel.js': {
+                description: '리뷰 데이터베이스 모델을 정의한 파일입니다. 리뷰 정보의 구조와 관계를 정의합니다.',
+                images: ['images/reviewModel1.png', 'images/reviewModel2.png']
+            },
+            'dibsModel.js': {
+                description: '찜하기 데이터베이스 모델을 정의한 파일입니다. 찜하기 정보의 구조와 관계를 정의합니다.',
+                images: ['images/dibsModel1.png', 'images/dibsModel2.png']
+            },
+            'database.js': {
+                description: '데이터베이스 연결 설정을 정의한 파일입니다. MySQL 연결 정보와 설정을 관리합니다.',
+                images: ['images/database1.png', 'images/database2.png']
+            },
+            'validators.js': {
+                description: '입력값 검증을 위한 유틸리티 함수들이 정의된 파일입니다. 이메일, 비밀번호, 전화번호 등의 유효성 검사를 수행합니다.',
+                images: ['images/validators1.png', 'images/validators2.png']
+            }
+        };
+
+        // 모달 열기/닫기 이벤트
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('detail-btn')) {
+                const activeFolder = document.querySelector('.folder-name.active');
+                if (activeFolder) {
+                    const fileName = activeFolder.textContent.trim();
+                    const fileDetail = fileDetails[fileName];
+                    
+                    if (fileDetail) {
+                        detailModal.querySelector('.detail-modal-title').textContent = fileName;
+                        detailModal.querySelector('.detail-modal-description').textContent = fileDetail.description;
+                        const images = detailModal.querySelectorAll('.detail-image img');
+                        images[0].src = fileDetail.images[0];
+                        images[1].src = fileDetail.images[1];
+                        detailModal.classList.add('show');
+                    }
+                }
+            }
+        });
+
+        detailModal.querySelector('.close-detail-modal').addEventListener('click', () => {
+            detailModal.classList.remove('show');
+        });
+
+        // 모달 외부 클릭시 닫기
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) {
+                detailModal.classList.remove('show');
+            }
         });
     </script>
 </body>
