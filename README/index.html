@@ -619,6 +619,8 @@
             line-height: 1.6;
             color: #444;
             margin-bottom: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         .close-detail-modal {
@@ -633,20 +635,71 @@
             display: flex;
             gap: 20px;
             justify-content: center;
-            margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .detail-image {
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
             width: 45%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            max-width: 500px;
         }
 
         .detail-image img {
             width: 100%;
             height: auto;
+            object-fit: contain;
             border-radius: 8px;
+        }
+
+        .detail-image:hover {
+            transform: scale(1.02);
+        }
+
+        /* Back 폴더 이미지 스타일 */
+        .detail-image.back-image {
+            cursor: default;
+            width: 100%;
+            max-width: none;
+        }
+
+        .detail-image.back-image:hover {
+            transform: none;
+        }
+
+        .detail-image.back-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        .image-zoom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1002;
+        }
+
+        .image-zoom-modal.show {
+            display: block;
+        }
+
+        .image-zoom-modal img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        .detail-modal-content {
+            position: relative;
         }
     </style>
 </head>
@@ -672,6 +725,10 @@
             <button class="close-erd-modal">&times;</button>
             <div id="erd-content"></div>
         </div>
+    </div>
+
+    <div class="image-zoom-modal">
+        <img src="" alt="확대된 이미지">
     </div>
 
     <script>
@@ -1167,23 +1224,6 @@
                                             ]
                                         },
                                         {
-                                            "name": "nbproject",
-                                            "type": "folder",
-                                            "description": "NetBeans 프로젝트 설정 파일들이 위치한 폴더입니다.",
-                                            "children": [
-                                                {
-                                                    "name": "project.xml",
-                                                    "type": "file",
-                                                    "description": "NetBeans 프로젝트의 XML 설정 파일입니다."
-                                                },
-                                                {
-                                                    "name": "project.properties",
-                                                    "type": "file",
-                                                    "description": "NetBeans 프로젝트의 속성 설정 파일입니다."
-                                                }
-                                            ]
-                                        },
-                                        {
                                             "name": "app.js",
                                             "type": "file",
                                             "description": "Express 애플리케이션 설정 파일입니다."
@@ -1261,7 +1301,31 @@
                                 const descriptionTitle = descriptionContainer.querySelector('.description-title');
                                 const fileName = folderName.textContent.trim();
                                 
-                                if (fileDetails[fileName]) {
+                                // 이미지와 연관된 파일 목록
+                                const filesWithImages = [
+                                    'userRoutes.js',
+                                    'placeRoutes.js',
+                                    'reviewRoutes.js',
+                                    'dibsRoutes.js',
+                                    'userModel.js',
+                                    'placeModel.js',
+                                    'reviewModel.js',
+                                    'dibsModel.js',
+                                    'database.js',
+                                    'validators.js',
+                                    'app.js',
+                                    'Home.jsx',
+                                    'Login.jsx',
+                                    'Regist.jsx',
+                                    'Select.jsx',
+                                    'CardLayout.jsx',
+                                    'Review.jsx',
+                                    'DibsList.jsx',
+                                    'MyPage.jsx',
+                                    'About.jsx'
+                                ];
+                                
+                                if (filesWithImages.includes(fileName)) {
                                     descriptionTitle.innerHTML = `
                                         <span>테이블 설명</span>
                                         <button class="detail-btn">상세설명</button>
@@ -1826,44 +1890,95 @@
         // 파일별 상세설명 데이터
         const fileDetails = {
             'userRoutes.js': {
-                description: '사용자 관련 API 라우트를 정의한 파일입니다. 회원가입, 로그인, 회원정보 수정, 회원탈퇴 등의 기능을 처리합니다.',
-                images: ['images/userRoutes1.png', 'images/userRoutes2.png']
+                description: '사용자 관련 API 라우트를 정의한 파일입니다. 회원가입, 로그인, 회원정보 수정, 회원탈퇴 등의 기능을 처리합니다.\n로그인의 방식으로는 세션 로그인 방식을 사용하여 보안을 강화했습니다.',
+                images: ['images/userRoutes.png'],
+                fullWidth: true
             },
             'placeRoutes.js': {
                 description: '장소 관련 API 라우트를 정의한 파일입니다. 장소 검색, 상세정보 조회, 필터링 등의 기능을 처리합니다.',
-                images: ['images/placeRoutes1.png', 'images/placeRoutes2.png']
+                images: ['images/placeRoutes.png'],
+                fullWidth: true
             },
             'reviewRoutes.js': {
                 description: '리뷰 관련 API 라우트를 정의한 파일입니다. 리뷰 작성, 수정, 삭제, 조회 등의 기능을 처리합니다.',
-                images: ['images/reviewRoutes1.png', 'images/reviewRoutes2.png']
+                images: ['images/reviewRoutes.png'],
+                fullWidth: true
             },
             'dibsRoutes.js': {
                 description: '찜하기 관련 API 라우트를 정의한 파일입니다. 장소 찜하기, 찜 목록 조회, 찜 취소 등의 기능을 처리합니다.',
-                images: ['images/dibsRoutes1.png', 'images/dibsRoutes2.png']
+                images: ['images/dibsRoutes.png'],
+                fullWidth: true
             },
             'userModel.js': {
                 description: '사용자 데이터베이스 모델을 정의한 파일입니다. 사용자 정보의 구조와 관계를 정의합니다.',
-                images: ['images/userModel1.png', 'images/userModel2.png']
+                images: ['images/userModel.png'],
+                fullWidth: true
             },
             'placeModel.js': {
                 description: '장소 데이터베이스 모델을 정의한 파일입니다. 장소 정보의 구조와 관계를 정의합니다.',
-                images: ['images/placeModel1.png', 'images/placeModel2.png']
+                images: ['images/placeModel.png'],
+                fullWidth: true
             },
             'reviewModel.js': {
                 description: '리뷰 데이터베이스 모델을 정의한 파일입니다. 리뷰 정보의 구조와 관계를 정의합니다.',
-                images: ['images/reviewModel1.png', 'images/reviewModel2.png']
+                images: ['images/reviewModel.png'],
+                fullWidth: true
             },
             'dibsModel.js': {
                 description: '찜하기 데이터베이스 모델을 정의한 파일입니다. 찜하기 정보의 구조와 관계를 정의합니다.',
-                images: ['images/dibsModel1.png', 'images/dibsModel2.png']
+                images: ['images/dibsModel.png'],
+                fullWidth: true
             },
             'database.js': {
                 description: '데이터베이스 연결 설정을 정의한 파일입니다. MySQL 연결 정보와 설정을 관리합니다.',
-                images: ['images/database1.png', 'images/database2.png']
+                images: ['images/database.png'],
+                fullWidth: true
             },
             'validators.js': {
                 description: '입력값 검증을 위한 유틸리티 함수들이 정의된 파일입니다. 이메일, 비밀번호, 전화번호 등의 유효성 검사를 수행합니다.',
-                images: ['images/validators1.png', 'images/validators2.png']
+                images: ['images/validators.png'],
+                fullWidth: true
+            },
+            'app.js': {
+                description: 'Express 애플리케이션의 메인 설정 파일입니다. 미들웨어 설정과 기본 라우팅의 정의 및 세션 로그인에 사용될 쿠키의 생성 정보가 담겨있습니다.',
+                images: ['images/app.png'],
+                fullWidth: true
+            },
+            'Home.jsx': {
+                description: '홈 페이지의 메인 컴포넌트입니다. 추천 장소와 인기 장소를 표시합니다.',
+                images: ['images/Home.png']
+            },
+            'Login.jsx': {
+                description: '로그인 페이지 컴포넌트입니다. 사용자 인증을 처리합니다.',
+                images: ['images/Login.png']
+            },
+            'Regist.jsx': {
+                description: '회원가입 페이지 컴포넌트입니다. 새로운 사용자 등록을 처리합니다.',
+                images: ['images/Regist.png']
+            },
+            'Select.jsx': {
+                description: '장소 선택 페이지 컴포넌트입니다. 필터링과 정렬 기능을 제공합니다.',
+                images: ['images/Select.png']
+            },
+            'CardLayout.jsx': {
+                description: '장소 카드 레이아웃 컴포넌트입니다. 장소 정보를 카드 형태로 표시합니다.',
+                images: ['images/CardLayout.png']
+            },
+            'Review.jsx': {
+                description: '리뷰 컴포넌트입니다. 장소에 대한 리뷰 작성과 표시를 담당합니다.',
+                images: ['images/Review.png']
+            },
+            'DibsList.jsx': {
+                description: '찜 목록 페이지 컴포넌트입니다. 사용자가 찜한 장소 목록을 표시합니다.',
+                images: ['images/DibsList.png']
+            },
+            'MyPage.jsx': {
+                description: '마이페이지 컴포넌트입니다. 사용자 정보 관리와 활동 내역을 표시합니다.',
+                images: ['images/MyPage.png']
+            },
+            'About.jsx': {
+                description: '소개 페이지 컴포넌트입니다. 서비스 소개와 주요 기능을 설명합니다.',
+                images: ['images/About-Modal.png', 'images/About-Review.png', 'images/About-Map.png', 'images/About-Pic.png']
             }
         };
 
@@ -1878,14 +1993,37 @@
                     if (fileDetail) {
                         detailModal.querySelector('.detail-modal-title').textContent = fileName;
                         detailModal.querySelector('.detail-modal-description').textContent = fileDetail.description;
-                        const images = detailModal.querySelectorAll('.detail-image img');
-                        images[0].src = fileDetail.images[0];
-                        images[1].src = fileDetail.images[1];
+                        
+                        // 이미지 컨테이너 초기화
+                        const imagesContainer = detailModal.querySelector('.detail-images-container');
+                        imagesContainer.innerHTML = '';
+                        
+                        // 각 이미지에 대해 이미지 요소 생성
+                        fileDetail.images.forEach((imageSrc, index) => {
+                            const imageDiv = document.createElement('div');
+                            imageDiv.className = `detail-image ${fileDetail.fullWidth ? 'back-image' : ''}`;
+                            const img = document.createElement('img');
+                            img.src = imageSrc;
+                            img.alt = `${fileName} 이미지 ${index + 1}`;
+                            img.style.borderRadius = '8px';
+                            imageDiv.appendChild(img);
+                            imagesContainer.appendChild(imageDiv);
+                        });
+                        
                         detailModal.classList.add('show');
                     }
                 }
             }
         });
+
+        // 모달 내부 스크롤 이벤트 처리
+        detailModal.addEventListener('wheel', (e) => {
+            e.stopPropagation();
+        }, { passive: true });
+
+        detailModal.addEventListener('touchmove', (e) => {
+            e.stopPropagation();
+        }, { passive: true });
 
         detailModal.querySelector('.close-detail-modal').addEventListener('click', () => {
             detailModal.classList.remove('show');
@@ -1895,6 +2033,38 @@
         detailModal.addEventListener('click', (e) => {
             if (e.target === detailModal) {
                 detailModal.classList.remove('show');
+            }
+        });
+
+        // 이미지 확대 모달 관련 코드
+        const imageZoomModal = document.querySelector('.image-zoom-modal');
+        const zoomedImage = imageZoomModal.querySelector('img');
+
+        // 이미지 클릭 이벤트 위임
+        document.addEventListener('click', (e) => {
+            const detailImage = e.target.closest('.detail-image');
+            if (detailImage && !detailImage.classList.contains('back-image')) {
+                const img = detailImage.querySelector('img');
+                if (img) {
+                    zoomedImage.src = img.src;
+                    imageZoomModal.classList.add('show');
+                }
+            } else if (!e.target.closest('.detail-modal-content')) {
+                // 모달 외부 클릭 시 모든 확대된 이미지 원래대로
+                document.querySelectorAll('.detail-image.zoomed').forEach(img => {
+                    img.classList.remove('zoomed');
+                });
+                imageZoomModal.classList.remove('show');
+            }
+        });
+
+        // ESC 키로 확대된 이미지 원래대로
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.detail-image.zoomed').forEach(img => {
+                    img.classList.remove('zoomed');
+                });
+                imageZoomModal.classList.remove('show');
             }
         });
     </script>
