@@ -3,6 +3,8 @@
 **여기갈래**는 데이트 장소 추천, 리뷰, 찜(즐겨찾기) 기능을 제공하는 웹 애플리케이션입니다.  
 React(Vite) 기반의 프론트엔드와 Node.js(Express), MariaDB 기반의 백엔드로 구성되어 있습니다.
 
+![여기갈래](README/images/title.png)
+
 ---
 
 ## 목차
