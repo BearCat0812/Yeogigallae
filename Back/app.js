@@ -17,6 +17,7 @@ app.use(cors({
 
 app.use(express.json());
 
+// 세션-쿠키 설정
 app.use(expressSession({
     secret: 'KEY',
     resave: false,

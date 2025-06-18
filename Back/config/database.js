@@ -1,5 +1,6 @@
 const mariadb = require('mariadb');
 
+// DB 연결
 const pool = mariadb.createPool({
     host: "192.168.0.191",
     user: "1team",
